@@ -100,24 +100,36 @@
   }
   /* Clean navbar buttons without glow */
   .btn-nav {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium border transition-colors;
-    background-color: rgba(0,0,0,0.05);
-    color: #1f2937; /* gray-800 for better contrast */
-    border-color: rgba(0,0,0,0.08);
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium border transition-all duration-200;
+    background-color: rgba(0,0,0,0.03);
+    color: #374151; /* gray-700 for better contrast */
+    border-color: rgba(0,0,0,0.06);
+  }
+  .btn-nav:hover {
+    background-color: rgba(0,0,0,0.08);
+    transform: translateY(-1px);
   }
   .dark .btn-nav {
-    background-color: rgba(255,255,255,0.05);
-    color: #f9fafb; /* gray-50 for better contrast */
-    border-color: rgba(255,255,255,0.12);
+    background-color: rgba(255,255,255,0.03);
+    color: #d1d5db; /* gray-300 for better contrast */
+    border-color: rgba(255,255,255,0.08);
+  }
+  .dark .btn-nav:hover {
+    background-color: rgba(255,255,255,0.08);
   }
   .btn-nav-active {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-white transition-colors;
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-white transition-all duration-200;
     background-image: linear-gradient(
       90deg,
       rgb(var(--primary-start)) 0%,
       rgb(var(--primary-mid)) 50%,
       rgb(var(--primary-end)) 100%
     );
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .btn-nav-active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold border transition-all duration-200;
