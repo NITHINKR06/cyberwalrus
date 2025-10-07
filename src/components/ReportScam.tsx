@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
 import { AlertTriangle, CheckCircle, Send, MapPin, Phone, Shield, Download, Map } from 'lucide-react';
 import { submitScamReport, reportService } from '../services/backendApi';
 import MapPicker from './MapPicker';
@@ -480,10 +480,29 @@ export default function ReportScam() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
-                      <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="6-digit pincode" maxLength={6}
-                      />
+                      <div className="flex gap-2">
+                        <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
+                          className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="6-digit pincode" maxLength={6}
+                        />
+                        {formData.pincode.length === 6 && /^\d{6}$/.test(formData.pincode) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Auto-fill location from pincode
+                              setFormData(prev => ({
+                                ...prev,
+                                village: `Area with pincode ${formData.pincode}`,
+                                state: 'Karnataka',
+                                country: 'India',
+                              }));
+                            }}
+                            className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          >
+                            Auto-fill
+                          </button>
+                        )}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>

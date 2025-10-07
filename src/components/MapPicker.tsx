@@ -154,15 +154,15 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
       );
       
-      const address = response.data.address;
-      onLocationSelect({
-        houseNo: address.house_number || '',
-        streetName: address.road || '',
+          const address = response.data.address;
+          onLocationSelect({
+            houseNo: address.house_number || '',
+            streetName: address.road || '',
         village: address.village || address.town || address.city || '',
         tehsil: address.county || address.suburb || '',
         district: address.state_district || address.city_district || '',
         state: address.state || 'Karnataka',
-        pincode: address.postcode || '',
+            pincode: address.postcode || '',
         country: address.country || 'India',
       });
       
@@ -187,8 +187,8 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Select Location</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
-          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+        </div>
           
           <div className="mb-6">
             <div className="flex gap-2">
@@ -264,17 +264,36 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
 
           {searchResults.length === 0 && !searchQuery && (
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-3">Popular Karnataka Cities:</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {popularKarnatakaCities.map((city, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSearchQuery(city)}
-                    className="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg text-left transition-colors"
-                  >
-                    {city}
-                  </button>
-                ))}
+              <h3 className="font-semibold text-gray-800 mb-3">Quick Options:</h3>
+              
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Popular Karnataka Cities:</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {popularKarnatakaCities.map((city, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSearchQuery(city)}
+                      className="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg text-left transition-colors"
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Try Pincode Search:</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {['574110', '560001', '570001', '580001', '590001', '591101'].map((pincode, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSearchQuery(pincode)}
+                      className="p-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg text-center transition-colors font-mono"
+                    >
+                      {pincode}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -326,10 +345,11 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-800 mb-2">Search Tips:</h4>
             <ul className="text-sm text-blue-700 space-y-1">
+              <li>• <strong>Enter 6-digit pincode</strong> (e.g., 574110) for auto-fetch</li>
               <li>• Focus on Karnataka locations for best results</li>
               <li>• Include city and state for better results</li>
               <li>• Try different spellings if no results found</li>
-              <li>• Examples: "Bangalore, Karnataka", "Mysore, Karnataka", "Hubli, Karnataka"</li>
+              <li>• Examples: "574110", "Bangalore, Karnataka", "Mysore, Karnataka"</li>
             </ul>
           </div>
         </div>
