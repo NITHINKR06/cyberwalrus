@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { AlertTriangle, CheckCircle, Send, MapPin, Phone, Shield, Download } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Send, MapPin, Phone, Shield, Download, Map } from 'lucide-react';
 import { submitScamReport, reportService } from '../services/backendApi';
+import MapPicker from './MapPicker';
 
 export default function ReportScam() {
   const { user } = useAuth(); // Keep for potential future use
@@ -34,34 +35,24 @@ export default function ReportScam() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [showLocationPopup, setShowLocationPopup] = useState(false);
+  const [showMap, setShowMap] = useState(false); // State to control map visibility
   const [submittedReport, setSubmittedReport] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const scamTypes = [
-    'Phishing Email',
-    'Fake Website',
-    'Phone Scam',
-    'SMS Scam',
-    'Social Media Scam',
-    'Investment Fraud',
-    'Romance Scam',
-    'Tech Support Scam',
-    'UPI Related Frauds',
-    'Online Financial Fraud',
-    'Other',
+    'Phishing Email', 'Fake Website', 'Phone Scam', 'SMS Scam', 'Social Media Scam',
+    'Investment Fraud', 'Romance Scam', 'Tech Support Scam', 'UPI Related Frauds',
+    'Online Financial Fraud', 'Other',
   ];
 
   const genders = ['Male', 'Female', 'Other'];
   const states = [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
-    'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim',
-    'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand',
-    'West Bengal', 'Delhi', 'Chandigarh', 'Puducherry'
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
+    'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+    'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+    'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Chandigarh', 'Puducherry'
   ];
 
-  // Mock data for nearby police stations and helplines
   const nearbyStations = [
     { name: 'Cyber Crime Police Station', phone: '1800-419-3737', type: 'cyber' },
     { name: 'Local Police Station', phone: '100', type: 'police' },
@@ -80,7 +71,6 @@ export default function ReportScam() {
         phoneNumber: formData.phoneNumber || undefined,
         emailAddress: formData.email || undefined,
         severity: formData.severity,
-        // Enhanced complaint fields
         fullName: formData.fullName || undefined,
         mobile: formData.mobile || undefined,
         gender: formData.gender || undefined,
@@ -105,29 +95,10 @@ export default function ReportScam() {
 
       setSubmitted(true);
       setFormData({
-        scamType: '',
-        description: '',
-        url: '',
-        phoneNumber: '',
-        email: '',
-        severity: 'medium',
-        village: '',
-        tehsil: '',
-        policeStation: '',
-        pincode: '',
-        houseNo: '',
-        streetName: '',
-        colony: '',
-        district: '',
-        state: '',
-        country: 'India',
-        fullName: '',
-        mobile: '',
-        gender: '',
-        dob: '',
-        spouse: '',
-        relationWithVictim: '',
-        emailAddress: '',
+        scamType: '', description: '', url: '', phoneNumber: '', email: '', severity: 'medium',
+        village: '', tehsil: '', policeStation: '', pincode: '', houseNo: '', streetName: '',
+        colony: '', district: '', state: '', country: 'India', fullName: '', mobile: '',
+        gender: '', dob: '', spouse: '', relationWithVictim: '', emailAddress: '',
       });
     } catch (err) {
       console.error('Report submission failed:', err);
@@ -161,6 +132,14 @@ export default function ReportScam() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleLocationSelect = (address: any) => {
+    setFormData(prevData => ({
+      ...prevData,
+      ...address,
+    }));
+    setShowMap(false); // Close the map after selection
   };
 
   const LocationPopup = () => {
@@ -279,6 +258,8 @@ export default function ReportScam() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {showMap && <MapPicker onLocationSelect={handleLocationSelect} onClose={() => setShowMap(false)} />}
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Report a Scam</h1>
         <p className="text-gray-600">
@@ -299,16 +280,11 @@ export default function ReportScam() {
                       Scam Type *
                     </label>
                     <select
-                      name="scamType"
-                      value={formData.scamType}
-                      onChange={handleChange}
-                      required
+                      name="scamType" value={formData.scamType} onChange={handleChange} required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select a scam type</option>
-                      {scamTypes.map(type => (
-                        <option key={type} value={type}>{type}</option>
-                      ))}
+                      {scamTypes.map(type => (<option key={type} value={type}>{type}</option>))}
                     </select>
                   </div>
 
@@ -317,11 +293,7 @@ export default function ReportScam() {
                       Description *
                     </label>
                     <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      required
-                      rows={4}
+                      name="description" value={formData.description} onChange={handleChange} required rows={4}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       placeholder="Please provide as much detail as possible about the scam..."
                     />
@@ -329,28 +301,15 @@ export default function ReportScam() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Website URL
-                      </label>
-                      <input
-                        type="url"
-                        name="url"
-                        value={formData.url}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
+                      <input type="url" name="url" value={formData.url} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://example.com"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                      <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="+1 (555) 123-4567"
                       />
@@ -359,28 +318,15 @@ export default function ReportScam() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                      <input type="email" name="email" value={formData.email} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="scammer@example.com"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Severity *
-                      </label>
-                      <select
-                        name="severity"
-                        value={formData.severity}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Severity *</label>
+                      <select name="severity" value={formData.severity} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="low">Low</option>
@@ -398,107 +344,55 @@ export default function ReportScam() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                      <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter your full name"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Mobile Number *
-                      </label>
-                      <input
-                        type="tel"
-                        name="mobile"
-                        value={formData.mobile}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+                      <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="9876543210"
                       />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Gender *
-                      </label>
-                      <select
-                        name="gender"
-                        value={formData.gender}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
+                      <select name="gender" value={formData.gender} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Gender</option>
-                        {genders.map(gender => (
-                          <option key={gender} value={gender}>{gender}</option>
-                        ))}
+                        {genders.map(gender => (<option key={gender} value={gender}>{gender}</option>))}
                       </select>
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Date of Birth
-                      </label>
-                      <input
-                        type="date"
-                        name="dob"
-                        value={formData.dob}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                      <input type="date" name="dob" value={formData.dob} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        name="emailAddress"
-                        value={formData.emailAddress}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                      <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="your@email.com"
                       />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Spouse Name
-                      </label>
-                      <input
-                        type="text"
-                        name="spouse"
-                        value={formData.spouse}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Spouse Name</label>
+                      <input type="text" name="spouse" value={formData.spouse} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Spouse name if applicable"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Relation with Victim
-                      </label>
-                      <input
-                        type="text"
-                        name="relationWithVictim"
-                        value={formData.relationWithVictim}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Relation with Victim</label>
+                      <input type="text" name="relationWithVictim" value={formData.relationWithVictim} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Self/Spouse/Parent/Guardian"
                       />
@@ -509,161 +403,91 @@ export default function ReportScam() {
 
               {/* Address Details Section */}
               <div className="border-b border-gray-200 pb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Complainant Address</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800">Complainant Address</h3>
+                  <button type="button" onClick={() => setShowMap(true)}
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    <Map size={16} />
+                    Select from Map
+                  </button>
+                </div>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        House No.
-                      </label>
-                      <input
-                        type="text"
-                        name="houseNo"
-                        value={formData.houseNo}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">House No.</label>
+                      <input type="text" name="houseNo" value={formData.houseNo} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="House/Flat number"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Street Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="streetName"
-                        value={formData.streetName}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Street Name *</label>
+                      <input type="text" name="streetName" value={formData.streetName} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Street/Lane name"
                       />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Colony/Area
-                      </label>
-                      <input
-                        type="text"
-                        name="colony"
-                        value={formData.colony}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Colony/Area</label>
+                      <input type="text" name="colony" value={formData.colony} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Colony/Area name"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Village/Town *
-                      </label>
-                      <input
-                        type="text"
-                        name="village"
-                        value={formData.village}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Village/Town *</label>
+                      <input type="text" name="village" value={formData.village} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Village/Town name"
                       />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tehsil *
-                      </label>
-                      <input
-                        type="text"
-                        name="tehsil"
-                        value={formData.tehsil}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tehsil *</label>
+                      <input type="text" name="tehsil" value={formData.tehsil} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Tehsil name"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        District *
-                      </label>
-                      <input
-                        type="text"
-                        name="district"
-                        value={formData.district}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">District *</label>
+                      <input type="text" name="district" value={formData.district} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="District name"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        State *
-                      </label>
-                      <select
-                        name="state"
-                        value={formData.state}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                      <select name="state" value={formData.state} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select State</option>
-                        {states.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
+                        {states.map(state => (<option key={state} value={state}>{state}</option>))}
                       </select>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Police Station *
-                      </label>
-                      <input
-                        type="text"
-                        name="policeStation"
-                        value={formData.policeStation}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Police Station *</label>
+                      <input type="text" name="policeStation" value={formData.policeStation} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Police station name"
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Pincode *
-                      </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        value={formData.pincode}
-                        onChange={handleChange}
-                        required
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                      <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="6-digit pincode"
-                        maxLength={6}
+                        placeholder="6-digit pincode" maxLength={6}
                       />
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Country
-                      </label>
-                      <input
-                        type="text"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                      <input type="text" name="country" value={formData.country} onChange={handleChange}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Country"
                       />
@@ -674,18 +498,14 @@ export default function ReportScam() {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  type="button"
-                  onClick={() => setShowLocationPopup(true)}
+                <button type="button" onClick={() => setShowLocationPopup(true)}
                   className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <MapPin className="w-5 h-5" />
                   Find Nearby Police Stations
                 </button>
                 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
+                <button type="submit" disabled={isSubmitting}
                   className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
@@ -721,12 +541,9 @@ export default function ReportScam() {
               </div>
             </div>
           </div>
-
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 className="font-bold text-gray-800 mb-3">Earn Points</h3>
-            <p className="text-sm text-gray-700 mb-3">
-              Each verified report earns you:
-            </p>
+            <p className="text-sm text-gray-700 mb-3">Each verified report earns you:</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">Report submission</span>
@@ -738,7 +555,6 @@ export default function ReportScam() {
               </div>
             </div>
           </div>
-
           <div className="bg-white border border-gray-200 rounded-xl p-6">
             <h3 className="font-bold text-gray-800 mb-3">Your Reports</h3>
             <div className="space-y-2 text-sm">

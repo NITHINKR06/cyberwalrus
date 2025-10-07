@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Shield, ShieldOff, Zap, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, ShieldOff, Zap, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { analyzeContent, analyzeContentVulnerable } from '../services/backendApi';
 
 interface AnalysisResult {
@@ -30,6 +30,20 @@ export default function SecuritySandbox() {
   const [unsecuredResult, setUnsecuredResult] = useState<AnalysisResult | null>(null);
   const [securedResult, setSecuredResult] = useState<AnalysisResult | null>(null);
   const [apiStatus, setApiStatus] = useState<'checking' | 'configured' | 'not-configured'>('checking');
+
+  useEffect(() => {
+    // Check if API is properly configured by making a test call
+    const checkApiStatus = async () => {
+      try {
+        await analyzeContent('text', 'test');
+        setApiStatus('configured');
+      } catch (error) {
+        setApiStatus('not-configured');
+      }
+    };
+    
+    checkApiStatus();
+  }, []);
 
   const handleAttack = async (prompt: string) => {
     setIsLoading(true);
@@ -74,9 +88,31 @@ export default function SecuritySandbox() {
     <div className="max-w-6xl mx-auto p-4">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">AI Security Sandbox</h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 mb-4">
           See how WALRUS defends against Prompt Injection attacks in real-time.
         </p>
+        
+        {/* API Status Indicator */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium">
+          {apiStatus === 'checking' && (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <span className="text-blue-600">Checking API configuration...</span>
+            </>
+          )}
+          {apiStatus === 'configured' && (
+            <>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-green-600">API configured - Ready for testing</span>
+            </>
+          )}
+          {apiStatus === 'not-configured' && (
+            <>
+              <XCircle className="h-4 w-4 text-red-600" />
+              <span className="text-red-600">API not configured - Using fallback responses</span>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
