@@ -43,8 +43,8 @@ export default function Leaderboard() {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('leaderboard.title')}</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-gray-100 mb-2">{t('leaderboard.title')}</h1>
+        <p className="text-gray-400">
           {t('leaderboard.subtitle')}
         </p>
       </div>

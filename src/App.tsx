@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Auth from './components/Auth';
@@ -8,6 +8,7 @@ import Achievements from './components/Achievements';
 import Leaderboard from './components/Leaderboard';
 import ReportScam from './components/ReportScam';
 import ScamAnalyzer from './components/ScamAnalyzer';
+import SecuritySandbox from './components/SecuritySandbox'; // 1. IMPORT THE NEW COMPONENT
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,14 +22,32 @@ import {
   Menu,
   X,
   Shield,
-  Search
+  Search,
+  FlaskConical // Icon for the sandbox
 } from 'lucide-react';
 
 function AppContent() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const [currentView, setCurrentView] = useState<'dashboard' | 'modules' | 'achievements' | 'leaderboard' | 'report' | 'analyzer'>('dashboard');
+  // Add the new view to the type definition
+  const [currentView, setCurrentView] = useState<'dashboard' | 'modules' | 'achievements' | 'leaderboard' | 'report' | 'analyzer' | 'sandbox'>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
 
   if (!user) {
     return <Auth />;
@@ -38,19 +57,22 @@ function AppContent() {
     { id: 'dashboard', name: t('nav.dashboard'), icon: LayoutDashboard },
     { id: 'modules', name: t('nav.learn'), icon: BookOpen },
     { id: 'achievements', name: t('nav.achievements'), icon: Award },
-    { id: 'leaderboard', name: t('nav.leaderboard'), icon: Trophy },
     { id: 'report', name: t('nav.reportScam'), icon: AlertTriangle },
     { id: 'analyzer', name: t('nav.scamAnalyzer'), icon: Search },
+    // 2. ADD NAVIGATION ITEM FOR THE SANDBOX
+    { id: 'sandbox', name: 'Security Sandbox', icon: FlaskConical },
   ] as const;
 
   return (
-    <div className="min-h-screen bg-midnight-900">
-      <nav className="sticky top-0 z-50 bg-[rgba(15,23,42,0.7)] backdrop-blur-md border-b border-glass">
+    <div className="min-h-screen bg-midnight-900 relative overflow-x-hidden">
+      <div className="bg-pattern" />
+      <div className="bg-scanline-overlay" />
+      <nav className="sticky top-0 z-50 backdrop-blur-md border-b border-glass bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(15,23,42,0.7)]">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center gap-3">
-                <div className="p-2 rounded-xl shadow-neon bg-gradient-to-br from-indigo-600 to-cyan-500">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300">WALRUS</span>
@@ -64,11 +86,7 @@ function AppContent() {
                   <button
                     key={item.id}
                     onClick={() => setCurrentView(item.id as any)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                      currentView === item.id
-                        ? 'btn-primary'
-                        : 'btn-secondary'
-                    }`}
+                    className={`${currentView === item.id ? 'btn-nav-active' : 'btn-nav'}`}
                   >
                     <Icon className="w-5 h-5" />
                     <span>{item.name}</span>
@@ -89,7 +107,7 @@ function AppContent() {
 
               <button
                 onClick={logout}
-                className="hidden md:flex items-center gap-2 px-4 py-2 btn-secondary"
+                className="hidden md:flex items-center gap-2 btn-nav"
               >
                 <LogOut className="w-5 h-5" />
               </button>
@@ -99,6 +117,13 @@ function AppContent() {
                 className="md:hidden p-2 rounded-xl text-slate-200 bg-white/5 border border-glass"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+              <button
+                onClick={() => setIsDark(v => !v)}
+                aria-label="Toggle theme"
+                className="p-2 rounded-xl border border-glass bg-white/5 text-slate-200 hover:bg-white/10"
+              >
+                {isDark ? '🌙' : '🌞'}
               </button>
             </div>
           </div>
@@ -116,8 +141,8 @@ function AppContent() {
                       setCurrentView(item.id as any);
                       setMobileMenuOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
-                      currentView === item.id ? 'btn-primary' : 'btn-secondary'
+                    className={`w-full flex items-center gap-3 rounded-xl font-medium transition-all ${
+                      currentView === item.id ? 'btn-nav-active' : 'btn-nav'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -127,7 +152,7 @@ function AppContent() {
               })}
               <button
                 onClick={logout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium btn-secondary"
+                className="w-full flex items-center gap-3 rounded-xl font-medium btn-nav"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
@@ -141,9 +166,10 @@ function AppContent() {
         {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'modules' && <LearningModules />}
         {currentView === 'achievements' && <Achievements />}
-        {currentView === 'leaderboard' && <Leaderboard />}
         {currentView === 'report' && <ReportScam />}
         {currentView === 'analyzer' && <ScamAnalyzer />}
+        {/* 3. ADD THE SANDBOX COMPONENT TO THE VIEW */}
+        {currentView === 'sandbox' && <SecuritySandbox />}
       </main>
       
       <ToastContainer

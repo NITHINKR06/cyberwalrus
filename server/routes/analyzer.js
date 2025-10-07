@@ -92,6 +92,26 @@ router.post('/analyze', async (req, res) => {
   }
 });
 
+// ADD THIS NEW ROUTE to analyzer.js, before the existing '/history' route
+
+// Vulnerable endpoint for the Security Sandbox demonstration
+router.post('/analyze-vulnerable', async (req, res) => {
+  try {
+      const { inputType, inputContent } = req.body;
+      if (!inputType || !inputContent) {
+          return res.status(400).json({ error: 'Input type and content are required' });
+      }
+
+      // Call the new weak prompt function
+      const result = await aiAnalyzer.analyzeWithWeakPrompt(inputType, inputContent);
+
+      res.json(result);
+  } catch (error) {
+      console.log('Error in vulnerable analysis:', error);
+      res.status(500).json({ error: 'Server error during vulnerable analysis' });
+  }
+});
+
 // Get user's analysis history (authenticated)
 router.get('/history', authenticateToken, async (req, res) => {
   try {

@@ -48,6 +48,14 @@ export const authService = {
   }
 };
 
+// ADD THIS NEW FUNCTION to backendApi.ts
+
+// Convenience function for the vulnerable analyzer
+export const analyzeContentVulnerable = async (inputType: string, inputContent: string) => {
+  const response = await api.post('/analyzer/analyze-vulnerable', { inputType, inputContent });
+  return response.data;
+};
+
 // Report Services (Public - no auth required)
 export const reportService = {
   submit: async (reportData: {
@@ -57,8 +65,33 @@ export const reportService = {
     phoneNumber?: string;
     emailAddress?: string;
     severity: string;
+    // Enhanced complaint fields
+    fullName?: string;
+    mobile?: string;
+    gender?: string;
+    dob?: string;
+    spouse?: string;
+    relationWithVictim?: string;
+    personalEmail?: string;
+    houseNo?: string;
+    streetName?: string;
+    colony?: string;
+    village?: string;
+    tehsil?: string;
+    district?: string;
+    state?: string;
+    country?: string;
+    policeStation?: string;
+    pincode?: string;
   }) => {
     const response = await api.post('/reports', reportData);
+    return response.data;
+  },
+
+  downloadPDF: async (reportId: string) => {
+    const response = await api.get(`/reports/pdf/${reportId}`, {
+      responseType: 'blob'
+    });
     return response.data;
   },
 

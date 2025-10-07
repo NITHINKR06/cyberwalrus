@@ -58,26 +58,26 @@ export default function Dashboard() {
         <h1 className="section-title mb-2">
           {t('dashboard.welcome', { username: user.username })}
         </h1>
-        <p className="text-slate-400">{t('dashboard.subtitle')}</p>
+        <p className="text-[rgb(var(--text-secondary))]">{t('dashboard.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="dash-fade-up opacity-0 translate-y-3 glass-card p-6 border-l-4 border-indigo-500/80">
+        <div className="dash-fade-up opacity-0 translate-y-3 card border-l-4 border-indigo-500/60">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-slate-300">{t('dashboard.totalPoints')}</h3>
+            <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('dashboard.totalPoints')}</h3>
             <Trophy className="w-5 h-5 text-indigo-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white">{user.totalPoints}</p>
-          <p className="text-xs text-slate-400 mt-1">{t('dashboard.keepLearning')}</p>
+          <p className="text-3xl font-extrabold text-[rgb(var(--text-primary))]">{user.totalPoints}</p>
+          <p className="text-xs text-[rgb(var(--text-secondary))] mt-1">{t('dashboard.keepLearning')}</p>
         </div>
 
-        <div className="dash-fade-up opacity-0 translate-y-3 glass-card p-6 border-l-4 border-emerald-500/80">
+        <div className="dash-fade-up opacity-0 translate-y-3 card border-l-4 border-emerald-500/60">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-slate-300">{t('dashboard.currentLevel')}</h3>
+            <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('dashboard.currentLevel')}</h3>
             <TrendingUp className="w-5 h-5 text-emerald-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white">{user.level}</p>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-3xl font-extrabold text-[rgb(var(--text-primary))]">{user.level}</p>
+          <p className="text-xs text-[rgb(var(--text-secondary))] mt-1">
             {t('dashboard.pointsToNext', { 
               points: 500 - (user.totalPoints % 500), 
               level: user.level + 1 
@@ -85,24 +85,24 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="dash-fade-up opacity-0 translate-y-3 glass-card p-6 border-l-4 border-orange-500/80">
+        <div className="dash-fade-up opacity-0 translate-y-3 card border-l-4 border-orange-500/60">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-slate-300">{t('dashboard.currentStreak')}</h3>
+            <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('dashboard.currentStreak')}</h3>
             <Flame className="w-5 h-5 text-orange-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white">
+          <p className="text-3xl font-extrabold text-[rgb(var(--text-primary))]">
             {t('dashboard.daysStreak', { days: user.currentStreak })}
           </p>
-          <p className="text-xs text-slate-400 mt-1">{t('dashboard.maintainStreak')}</p>
+          <p className="text-xs text-[rgb(var(--text-secondary))] mt-1">{t('dashboard.maintainStreak')}</p>
         </div>
 
-        <div className="dash-fade-up opacity-0 translate-y-3 glass-card p-6 border-l-4 border-purple-500/80">
+        <div className="dash-fade-up opacity-0 translate-y-3 card border-l-4 border-purple-500/60">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-slate-300">{t('dashboard.badgesEarned')}</h3>
+            <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('dashboard.badgesEarned')}</h3>
             <Award className="w-5 h-5 text-purple-400" />
           </div>
-          <p className="text-3xl font-extrabold text-white">{earnedBadges.length}</p>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-3xl font-extrabold text-[rgb(var(--text-primary))]">{earnedBadges.length}</p>
+          <p className="text-xs text-[rgb(var(--text-secondary))] mt-1">
             {t('dashboard.outOf', { total: badges.length })}
           </p>
         </div>
@@ -111,18 +111,18 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-2 card">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-white">{t('dashboard.learningProgress')}</h2>
+            <h2 className="text-xl font-bold text-[rgb(var(--text-primary))]">{t('dashboard.learningProgress')}</h2>
             <Target className="w-6 h-6 text-indigo-400" />
           </div>
 
           <div className="mb-4">
             <div className="flex justify-between text-sm mb-2">
-              <span className="text-slate-300">{t('dashboard.modulesCompleted')}</span>
-              <span className="font-semibold text-white">
+              <span className="text-[rgb(var(--text-secondary))]">{t('dashboard.modulesCompleted')}</span>
+              <span className="font-semibold text-[rgb(var(--text-primary))]">
                 {completedModules} / {totalModules}
               </span>
             </div>
-            <div className="w-full bg-white/10 rounded-full h-4 overflow-hidden border border-glass">
+            <div className="w-full rounded-full h-4 overflow-hidden border border-glass bg-[rgba(0,0,0,0.08)] dark:bg-white/10">
               <div
                 className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2 shadow-neon"
                 style={{ width: `${progressPercentage}%` }}
@@ -137,19 +137,19 @@ export default function Dashboard() {
           </div>
 
           <div className="mt-6 pt-6 border-t border-glass">
-            <h3 className="text-sm font-semibold text-slate-200 mb-3">{t('dashboard.recentAchievements')}</h3>
+            <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-3">{t('dashboard.recentAchievements')}</h3>
             <div className="space-y-2">
               {completedAchievements.slice(0, 3).map((achievement) => (
                 <div
                   key={achievement.id}
-                  className="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-400/30"
+                  className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-500/10 border-emerald-400/30 dark:bg-emerald-500/10 dark:border-emerald-400/30"
                 >
                   <div className="bg-emerald-500 p-2 rounded-full">
                     <Award className="w-4 h-4 text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-white text-sm">{achievement.name}</p>
-                    <p className="text-xs text-slate-300">{achievement.description}</p>
+                    <p className="font-semibold text-[rgb(var(--text-primary))] text-sm">{achievement.name}</p>
+                    <p className="text-xs text-[rgb(var(--text-secondary))]">{achievement.description}</p>
                   </div>
                   <span className="text-xs font-bold text-emerald-300">
                     +{achievement.pointsReward} pts
@@ -157,7 +157,7 @@ export default function Dashboard() {
                 </div>
               ))}
               {completedAchievements.length === 0 && (
-                <p className="text-sm text-slate-400 text-center py-4">
+                <p className="text-sm text-[rgb(var(--text-secondary))] text-center py-4">
                   {t('dashboard.completeModules')}
                 </p>
               )}
@@ -166,7 +166,7 @@ export default function Dashboard() {
         </div>
 
         <div className="card">
-          <h2 className="text-xl font-bold text-white mb-6">{t('dashboard.yourBadges')}</h2>
+          <h2 className="text-xl font-bold text-[rgb(var(--text-primary))] mb-6">{t('dashboard.yourBadges')}</h2>
 
           <div className="space-y-4">
             {earnedBadges.map((badge) => (
@@ -185,12 +185,12 @@ export default function Dashboard() {
             ))}
 
             {nextBadge && (
-              <div className="border-2 border-dashed border-white/20 rounded-lg p-4 bg-white/5">
+              <div className="border-2 border-dashed rounded-lg p-4 bg-[rgba(0,0,0,0.04)] border-[rgba(0,0,0,0.12)] dark:bg-white/5 dark:border-white/20">
                 <div className="flex items-center gap-3">
-                  <Award className="w-8 h-8 text-slate-300" />
+                  <Award className="w-8 h-8 text-[rgb(var(--text-secondary))]" />
                   <div>
-                    <p className="font-bold text-slate-200">{nextBadge.name}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="font-bold text-[rgb(var(--text-primary))]">{nextBadge.name}</p>
+                    <p className="text-xs text-[rgb(var(--text-secondary))]">
                       {t('dashboard.morePointsNeeded', { 
                         points: nextBadge.requirementPoints - user.totalPoints 
                       })}
@@ -207,7 +207,7 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-6">
           <Shield className="w-6 h-6 text-cyan-400" />
-          <h2 className="text-2xl font-bold text-white">{t('dashboard.threatIntelligence')}</h2>
+          <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))]">{t('dashboard.threatIntelligence')}</h2>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -227,7 +227,7 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-6">
           <Activity className="w-6 h-6 text-emerald-400" />
-          <h2 className="text-2xl font-bold text-white">{t('dashboard.yourAnalytics')}</h2>
+          <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))]">{t('dashboard.yourAnalytics')}</h2>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

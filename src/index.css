@@ -4,24 +4,81 @@
 
 @layer base {
   :root {
-    --bg-midnight: 11 16 32; /* #0b1020 */
-    --bg-panel: 15 23 42;    /* #0f172a */
-    --text-primary: 226 232 240; /* slate-200 */
-    --text-secondary: 148 163 184; /* slate-400 */
+    /* Light theme defaults */
+    --bg-midnight: 245 247 255; /* light panel */
+    --bg-panel: 255 255 255;
+    --text-primary: 15 23 42; /* slate-900 */
+    --text-secondary: 71 85 105; /* slate-600 */
+    /* Brand gradient (light) */
+    --primary-start: 99 102 241;   /* indigo-500 */
+    --primary-mid: 14 165 233;     /* sky-500 */
+    --primary-end: 34 211 238;     /* cyan-400 */
   }
   html, body, #root {
     height: 100%;
   }
   body {
     @apply bg-[rgb(var(--bg-midnight))] text-[rgb(var(--text-primary))];
-    background-image: radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.25), transparent 60%),
-      radial-gradient(1000px 500px at 90% 0%, rgba(34,211,238,0.20), transparent 60%),
-      radial-gradient(800px 400px at 50% 120%, rgba(30,200,255,0.18), transparent 60%);
     background-attachment: fixed;
+  }
+
+  /* Dark theme overrides on .dark root class */
+  .dark {
+    --bg-midnight: 11 16 32; /* #0b1020 */
+    --bg-panel: 15 23 42;    /* #0f172a */
+    --text-primary: 226 232 240; /* slate-200 */
+    --text-secondary: 148 163 184; /* slate-400 */
+    /* Brand gradient (dark - more saturated) */
+    --primary-start: 129 140 248;  /* indigo-400 */
+    --primary-mid: 56 189 248;     /* sky-400 */
+    --primary-end: 34 211 238;     /* cyan-400 */
   }
 }
 
 @layer components {
+  /* Background pattern layers */
+  .bg-pattern {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      /* fine horizontal lines */
+      repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.06) 0px,
+        rgba(0,0,0,0.06) 1px,
+        transparent 1px,
+        transparent 6px
+      ),
+      radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.10), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(34,211,238,0.08), transparent 60%),
+      radial-gradient(800px 400px at 50% 120%, rgba(30,200,255,0.06), transparent 60%);
+    opacity: 0.9;
+    animation: bg-drift 22s linear infinite;
+    transform: translateZ(0);
+  }
+  .dark .bg-pattern {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.06) 0px,
+        rgba(255,255,255,0.06) 1px,
+        transparent 1px,
+        transparent 6px
+      ),
+      radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.22), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(34,211,238,0.18), transparent 60%),
+      radial-gradient(800px 400px at 50% 120%, rgba(30,200,255,0.14), transparent 60%);
+  }
+  .bg-scanline-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%);
+    mix-blend-mode: multiply;
+  }
   .border-glass {
     border-color: rgba(255,255,255,0.12);
   }
@@ -29,24 +86,67 @@
     box-shadow: 0 0 20px rgba(30, 200, 255, 0.35), 0 0 60px rgba(99, 102, 241, 0.25);
   }
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-glass rounded-2xl shadow-neon;
+    @apply bg-white/5 backdrop-blur-xl border border-glass rounded-2xl;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold
-      bg-gradient-to-r from-indigo-500 via-sky-500 to-cyan-400 text-white
-      hover:from-indigo-400 hover:via-sky-400 hover:to-cyan-300
-      shadow-neon transition-all duration-200 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold text-white transition-all duration-200 active:scale-[0.98];
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--primary-start)) 0%,
+      rgb(var(--primary-mid)) 50%,
+      rgb(var(--primary-end)) 100%
+    );
+    filter: saturate(1.05);
+  }
+  /* Clean navbar buttons without glow */
+  .btn-nav {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium border transition-colors;
+    background-color: rgba(0,0,0,0.05);
+    color: rgb(var(--text-primary));
+    border-color: rgba(0,0,0,0.08);
+  }
+  .dark .btn-nav {
+    background-color: rgba(255,255,255,0.05);
+    color: rgb(var(--text-primary));
+    border-color: rgba(255,255,255,0.12);
+  }
+  .btn-nav-active {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-white transition-colors;
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--primary-start)) 0%,
+      rgb(var(--primary-mid)) 50%,
+      rgb(var(--primary-end)) 100%
+    );
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold
-      bg-white/5 text-slate-200 border border-glass hover:bg-white/10 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold border transition-all duration-200;
+    background-color: rgba(0,0,0,0.05);
+    color: rgb(var(--text-primary));
+    border-color: rgba(0,0,0,0.08);
+  }
+  .dark .btn-secondary {
+    background-color: rgba(255,255,255,0.05);
+    color: rgb(var(--text-primary));
+    border-color: rgba(255,255,255,0.12);
   }
   .card {
-    @apply glass-card p-6;
+    @apply p-6 rounded-2xl backdrop-blur-xl;
+    background-color: rgba(var(--bg-panel), 0.9);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .dark .card {
+    background-color: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.12);
   }
   .section-title {
-    @apply text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent
-      bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300 drop-shadow;
+    @apply text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent drop-shadow;
+    background-image: linear-gradient(
+      90deg,
+      rgb(var(--primary-start)) 0%,
+      rgb(var(--primary-mid)) 50%,
+      rgb(var(--primary-end)) 100%
+    );
   }
 }
 
@@ -54,5 +154,9 @@
   .mask-fade-top {
     -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
             mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  }
+  @keyframes bg-drift {
+    0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 0 8px, 20px 0, -30px 0, 15px 0; }
   }
 }

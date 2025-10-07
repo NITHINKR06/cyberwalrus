@@ -14,15 +14,17 @@ const scamReportSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
-      'phishingEmail',
-      'fakeWebsite',
-      'phoneScam',
-      'smsScam',
-      'socialMediaScam',
-      'investmentFraud',
-      'romanceScam',
-      'techSupportScam',
-      'other'
+      'Phishing Email',
+      'Fake Website',
+      'Phone Scam',
+      'SMS Scam',
+      'Social Media Scam',
+      'Investment Fraud',
+      'Romance Scam',
+      'Tech Support Scam',
+      'UPI Related Frauds',
+      'Online Financial Fraud',
+      'Other'
     ]
   },
   description: {
@@ -61,6 +63,42 @@ const scamReportSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  // Official complaint fields
+  complaintNumber: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  // Personal details
+  fullName: String,
+  mobile: String,
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other']
+  },
+  dob: Date,
+  spouse: String,
+  relationWithVictim: String,
+  personalEmail: String,
+  // Address details
+  houseNo: String,
+  streetName: String,
+  colony: String,
+  village: String,
+  tehsil: String,
+  district: String,
+  state: String,
+  country: {
+    type: String,
+    default: 'India'
+  },
+  policeStation: String,
+  pincode: String,
+  // PDF data
+  pdfData: {
+    md5Hash: String,
+    sha256Hash: String
   },
   updatedAt: {
     type: Date,

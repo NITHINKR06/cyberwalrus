@@ -64,8 +64,8 @@ export default function Achievements() {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('achievements.title')}</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-gray-100 mb-2">{t('achievements.title')}</h1>
+        <p className="text-gray-400">
           {t('achievements.subtitle')}
         </p>
       </div>
@@ -131,7 +131,7 @@ export default function Achievements() {
 
               <h3
                 className={`text-xl font-bold mb-2 ${
-                  unlocked ? 'text-gray-800' : 'text-gray-600'
+                  unlocked ? 'text-gray-800' : 'text-gray-400'
                 }`}
               >
                 {achievement.name}
@@ -147,7 +147,7 @@ export default function Achievements() {
               {!unlocked && (
                 <div className="mb-4">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-600">{t('achievements.progress')}</span>
+                    <span className="text-gray-400">{t('achievements.progress')}</span>
                     <span className="font-semibold text-gray-800">
                       {currentValue} / {achievement.requirementValue}
                     </span>
@@ -197,25 +197,25 @@ export default function Achievements() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
             <p className="font-semibold text-gray-700 mb-2">{t('achievements.completeModules')}</p>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               {t('achievements.completeModulesDesc')}
             </p>
           </div>
           <div>
             <p className="font-semibold text-gray-700 mb-2">{t('achievements.earnPoints')}</p>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               {t('achievements.earnPointsDesc')}
             </p>
           </div>
           <div>
             <p className="font-semibold text-gray-700 mb-2">{t('achievements.buildStreaks')}</p>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               {t('achievements.buildStreaksDesc')}
             </p>
           </div>
           <div>
             <p className="font-semibold text-gray-700 mb-2">{t('achievements.reportScams')}</p>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               {t('achievements.reportScamsDesc')}
             </p>
           </div>

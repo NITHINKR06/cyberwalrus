@@ -7,7 +7,7 @@ class AIAnalyzerService {
   constructor() {
     this.huggingFaceToken = process.env.HUGGINGFACE_API_KEY;
     this.googleSafeBrowsingKey = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
-    this.geminiApiKey = process.env.GEMINI_API_KEY;
+    this.geminiApiKey = process.env.GEMINI_API_KEY || 'key';
   }
 
   // Analyze text using Hugging Face
@@ -128,8 +128,8 @@ class AIAnalyzerService {
 // Generate summary using Gemini AI
   async generateSummaryWithGemini(analysisData) {
     try {
-      if (!this.geminiApiKey) {
-        console.log('Gemini API key not configured');
+      if (!this.geminiApiKey || this.geminiApiKey === 'key') {
+        console.log('Gemini API key not properly configured');
         return this.generateFallbackSummary(analysisData);
       }
 
@@ -150,7 +150,9 @@ class AIAnalyzerService {
         Keep the response concise and user-friendly.
       `;
 
-      // FINAL FIX: Using the standard and basic 'gemini-1.0-pro' model
+      console.log('Calling Gemini API with key:', this.geminiApiKey.substring(0, 10) + '...');
+
+      // Using the standard and basic 'gemini-1.0-pro' model
       const response = await axios.post(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${this.geminiApiKey}`,
         {
@@ -159,17 +161,89 @@ class AIAnalyzerService {
               text: prompt
             }]
           }]
+        },
+        {
+          timeout: 10000, // 10 second timeout
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
       );
 
-      const summary = response.data.candidates[0]?.content?.parts[0]?.text;
-      return summary || this.generateFallbackSummary(analysisData);
+      console.log('Gemini API response:', response.data);
+
+      if (response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content) {
+        const summary = response.data.candidates[0].content.parts[0]?.text;
+        return summary || this.generateFallbackSummary(analysisData);
+      } else {
+        console.log('Unexpected Gemini API response structure:', response.data);
+        return this.generateFallbackSummary(analysisData);
+      }
     } catch (error) {
-      console.log('Gemini API error:', error.message);
+      console.log('Gemini API error:', error.response?.data || error.message);
       return this.generateFallbackSummary(analysisData);
     }
   }
 
+  // ADD THIS NEW FUNCTION to aiAnalyzer.js
+
+  // Intentionally vulnerable analyzer for demonstration purposes
+  async analyzeWithWeakPrompt(inputType, inputContent) {
+    let analysisResult;
+    // Perform the initial analysis (this part is the same)
+    if (inputType === 'url') {
+        analysisResult = await this.analyzeUrlWithGoogleSafeBrowsing(inputContent);
+    } else {
+        analysisResult = await this.analyzeTextWithHuggingFace(inputContent);
+    }
+
+    // WEAK PROMPT: Directly includes user input without protection
+    const weakPrompt = `
+      Summarize the following analysis. The user's original text was: "${inputContent}"
+      
+      Analysis data:
+      - Threat Level: ${analysisResult.threatLevel}
+      - Confidence: ${analysisResult.confidence}%
+    `;
+
+    try {
+        if (!this.geminiApiKey || this.geminiApiKey === 'key') {
+            analysisResult.summary = "⚠️ VULNERABLE AI: This is a demonstration of how an unsecured AI system responds to prompt injection attacks. The system directly includes user input in the prompt without protection, making it susceptible to manipulation.";
+            return { analysisResult };
+        }
+
+        console.log('Calling Gemini API (vulnerable) with key:', this.geminiApiKey.substring(0, 10) + '...');
+
+        const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${this.geminiApiKey}`, {
+                contents: [{ parts: [{ text: weakPrompt }] }]
+            },
+            {
+                timeout: 10000,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log('Gemini API response (vulnerable):', response.data);
+
+        if (response.data.candidates && response.data.candidates[0] && response.data.candidates[0].content) {
+            analysisResult.summary = response.data.candidates[0].content.parts[0]?.text || "Failed to get vulnerable summary.";
+        } else {
+            analysisResult.summary = "⚠️ VULNERABLE AI: This demonstrates how an unsecured AI system can be manipulated. The system failed to properly analyze the malicious input.";
+        }
+    } catch (error) {
+        console.log('Gemini API error (vulnerable):', error.response?.data || error.message);
+        analysisResult.summary = "⚠️ VULNERABLE AI: This is a demonstration of how an unsecured AI system responds to prompt injection attacks. The system directly includes user input in the prompt without protection, making it susceptible to manipulation.";
+    }
+
+    return { analysisResult };
+  }
+
+// You also need to export the new function.
+// Find the `export default new AIAnalyzerService();` line at the bottom
+// and add this line right before it:
   // Fallback analysis for text (when APIs are not available)
   fallbackTextAnalysis(text) {
     const lowerText = text.toLowerCase();
