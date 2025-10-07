@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { AlertTriangle, CheckCircle, Send } from 'lucide-react';
+import { submitScamReport } from '../services/backendApi';
 
 export default function ReportScam() {
   const { user } = useAuth();
@@ -26,12 +27,21 @@ export default function ReportScam() {
     'Other',
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Scam report submitted:', formData);
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    try {
+      const payload = {
+        scamType: formData.scamType,
+        description: formData.description,
+        websiteUrl: formData.url || undefined,
+        phoneNumber: formData.phoneNumber || undefined,
+        emailAddress: formData.email || undefined,
+        severity: formData.severity,
+      };
+
+      await submitScamReport(payload);
+
+      setSubmitted(true);
       setFormData({
         scamType: '',
         description: '',
@@ -40,7 +50,10 @@ export default function ReportScam() {
         email: '',
         severity: 'medium',
       });
-    }, 3000);
+    } catch (err) {
+      console.error('Report submission failed:', err);
+      alert('Failed to submit report. Please try again.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

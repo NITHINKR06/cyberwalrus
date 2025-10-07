@@ -2,6 +2,54 @@ import type { LearningModule, Quiz, Achievement, Badge, LeaderboardEntry } from 
 
 export const learningModules: LearningModule[] = [
   {
+    id: 'beginner',
+    title: 'Cybercrime & Scam Basics (Beginner)',
+    description: 'Foundational concepts: phishing, identity theft, safe responses to suspicious messages',
+    content: `# Cybercrime & Scam Basics (Beginner)
+
+This module covers foundational cyber safety topics that your beginner quiz evaluates.
+
+## Topics Covered
+- What phishing is commonly used for
+- Recognizing smishing (SMS phishing)
+- Data most valuable to identity thieves
+- Safe handling of unknown payment requests
+- Common business scams (e.g., invoice fraud)
+
+## Practical Tips
+- Verify unexpected requests using official channels
+- Avoid clicking links in unsolicited messages
+- Guard personal and financial information
+`,
+    difficulty: 'beginner',
+    pointsReward: 80,
+    orderIndex: 0,
+  },
+  {
+    id: 'intermediate',
+    title: 'Financial Scams & Identity Protection (Intermediate)',
+    description: 'Deeper dive into BEC, vishing, vendor/invoice fraud, and data breach risks',
+    content: `# Financial Scams & Identity Protection (Intermediate)
+
+This module aligns with your intermediate quiz content focused on fraud targeting people and businesses.
+
+## Topics Covered
+- Business Email Compromise (BEC) and invoice/vendor fraud
+- Identity theft techniques (email spoofing, phishing)
+- Vishing calls impersonating banks
+- Red flags of fraudulent investment schemes
+- Data breach risks when storing customer data insecurely
+
+## Mitigations
+- Strict verification for payment change requests
+- Train for social engineering awareness
+- Reduce data exposure; implement proper security controls
+`,
+    difficulty: 'intermediate',
+    pointsReward: 120,
+    orderIndex: 3,
+  },
+  {
     id: '1',
     title: 'Password Security Basics',
     description: 'Learn how to create and manage strong passwords',
@@ -141,93 +189,223 @@ Online shopping safety prevents financial fraud and identity theft.
 ];
 
 export const quizzes: Quiz[] = [
+  // 🟢 Beginner Level – General Cybercrime & Business Scam Awareness
   {
     id: 'q1',
-    moduleId: '1',
-    question: 'What is the minimum recommended password length?',
-    options: ['6 characters', '8 characters', '12 characters', '20 characters'],
-    correctAnswer: 2,
-    explanation: '12 characters is the modern minimum recommendation for strong password security.',
-    points: 20,
+    moduleId: 'beginner',
+    question: 'What is phishing commonly used for?',
+    options: [
+      'Sending email newsletters',
+      'Tricking people into revealing personal or financial information',
+      'Buying products online',
+      'Installing antivirus software',
+    ],
+    correctAnswer: 1,
+    points: 10,
   },
   {
     id: 'q2',
-    moduleId: '1',
-    question: 'Which is the best password practice?',
-    options: [
-      'Use the same password for all accounts',
-      'Write passwords on paper',
-      'Use a unique password for each account',
-      'Share passwords with family',
-    ],
+    moduleId: 'beginner',
+    question: 'You receive a text claiming to be from your bank asking you to verify your account. What is this an example of?',
+    options: ['Adware', 'Credential stuffing', 'Smishing', 'Whaling'],
     correctAnswer: 2,
-    explanation: 'Using unique passwords for each account prevents a single breach from compromising all your accounts.',
-    points: 20,
+    points: 10,
   },
   {
     id: 'q3',
-    moduleId: '2',
-    question: 'What is a common sign of a phishing email?',
+    moduleId: 'beginner',
+    question: 'What kind of information is most valuable to identity thieves?',
     options: [
-      'Professional formatting',
-      'Urgent threatening language',
-      'Personalized greeting',
-      'Clear sender information',
+      'Social media photos',
+      'Bank account details and government ID numbers',
+      'Favorite movies',
+      'Public website URLs',
     ],
     correctAnswer: 1,
-    explanation: 'Phishing emails often use urgent or threatening language to pressure you into acting quickly without thinking.',
-    points: 30,
+    points: 10,
   },
   {
     id: 'q4',
-    moduleId: '2',
-    question: 'Before clicking a link in an email, what should you do?',
+    moduleId: 'beginner',
+    question: 'Which of the following is a safe practice when dealing with unknown payment requests via email?',
     options: [
-      'Click immediately',
-      'Forward to friends',
-      'Hover to see the actual URL',
-      'Delete the email',
+      'Responding quickly to avoid penalties',
+      'Clicking on any provided links',
+      'Verifying the request through an official contact method',
+      'Forwarding it to a friend',
     ],
     correctAnswer: 2,
-    explanation: 'Hovering over links reveals the actual destination URL, helping you identify malicious links.',
-    points: 30,
+    points: 10,
   },
   {
     id: 'q5',
-    moduleId: '3',
-    question: 'What is the recommended type of 2FA?',
-    options: ['SMS codes', 'Email codes', 'Authenticator apps', 'Security questions'],
+    moduleId: 'beginner',
+    question: 'A common business scam where attackers request fake invoice payments is called:',
+    options: ['Credential theft', 'Ransomware', 'Invoice fraud', 'Credit card skimming'],
     correctAnswer: 2,
-    explanation: 'Authenticator apps are more secure than SMS as they cannot be intercepted through SIM swapping attacks.',
-    points: 40,
+    points: 10,
   },
   {
     id: 'q6',
-    moduleId: '4',
-    question: 'What is social engineering?',
-    options: [
-      'Building social networks',
-      'Manipulating people to reveal information',
-      'Engineering software',
-      'Creating social media posts',
-    ],
-    correctAnswer: 1,
-    explanation: 'Social engineering exploits human psychology to trick people into revealing confidential information.',
-    points: 40,
+    moduleId: 'beginner',
+    question: 'Which of the following is a cybercrime that affects both individuals and companies?',
+    options: ['Social engineering', 'Two-factor authentication', 'File backup', 'Firewall configuration'],
+    correctAnswer: 0,
+    points: 10,
   },
   {
     id: 'q7',
-    moduleId: '5',
-    question: 'What should you look for to verify a secure shopping website?',
+    moduleId: 'beginner',
+    question: 'A scammer posing as a government official demanding payment is using what tactic?',
+    options: ['Encryption', 'Social engineering', 'Credential rotation', 'Penetration testing'],
+    correctAnswer: 1,
+    points: 10,
+  },
+  {
+    id: 'q8',
+    moduleId: 'beginner',
+    question: 'What is identity theft?',
     options: [
-      'Colorful design',
-      'HTTPS and padlock icon',
-      'Pop-up ads',
-      'Social media links',
+      'Creating a social media profile',
+      "Stealing someone's personal data to impersonate them",
+      'Using a VPN to browse the web',
+      'Backing up files to the cloud',
     ],
     correctAnswer: 1,
-    explanation: 'HTTPS and a padlock icon indicate the website uses encryption to protect your data.',
-    points: 30,
+    points: 10,
+  },
+  {
+    id: 'q9',
+    moduleId: 'beginner',
+    question: 'Which of the following is NOT a common target of personal cybercrime?',
+    options: ['Social Security Numbers', 'Medical records', 'Online shopping history', 'Encrypted passwords'],
+    correctAnswer: 3,
+    points: 10,
+  },
+  {
+    id: 'q10',
+    moduleId: 'beginner',
+    question: "When an attacker sends malware hidden in a job offer or resume, it's typically a:",
+    options: [
+      'Business Email Compromise',
+      'Trojan horse attack',
+      'Vishing scam',
+      'CEO fraud',
+    ],
+    correctAnswer: 1,
+    points: 10,
+  },
+
+  // 🟡 Intermediate Level – Financial Scams, Identity Theft & Common Threats
+  {
+    id: 'q11',
+    moduleId: 'intermediate',
+    question: 'A scammer tricks a company employee into transferring money to a fake account. This is called:',
+    options: [
+      'Man-in-the-middle fraud',
+      'Business email compromise (BEC)',
+      'SQL injection',
+      'Credential stuffing',
+    ],
+    correctAnswer: 1,
+    points: 10,
+  },
+  {
+    id: 'q12',
+    moduleId: 'intermediate',
+    question: 'Which of the following is a common method used by identity thieves to steal personal data?',
+    options: [
+      'Using strong encryption',
+      'Email spoofing and phishing',
+      'Installing updates',
+      'Two-factor authentication',
+    ],
+    correctAnswer: 1,
+    points: 10,
+  },
+  {
+    id: 'q13',
+    moduleId: 'intermediate',
+    question: 'You get a phone call from someone claiming to be from your bank, asking you to verify your account number. What is this?',
+    options: ['Malware', 'Data leak', 'Vishing', 'Hacking'],
+    correctAnswer: 2,
+    points: 10,
+  },
+  {
+    id: 'q14',
+    moduleId: 'intermediate',
+    question: 'A cybercriminal sends a fake payment request that appears to come from a trusted vendor. What is this known as?',
+    options: ['Vendor fraud', 'Data harvesting', 'Fake DNS routing', 'Session hijacking'],
+    correctAnswer: 0,
+    points: 10,
+  },
+  {
+    id: 'q15',
+    moduleId: 'intermediate',
+    question: 'Which practice can help prevent identity theft?',
+    options: [
+      'Using the same password for all accounts',
+      'Ignoring software updates',
+      'Shredding sensitive documents',
+      'Clicking on pop-up alerts',
+    ],
+    correctAnswer: 2,
+    points: 10,
+  },
+  {
+    id: 'q16',
+    moduleId: 'intermediate',
+    question: 'What makes credential stuffing effective for attackers?',
+    options: [
+      'It encrypts credentials automatically',
+      'Victims reuse the same passwords across websites',
+      'It requires physical access',
+      'It attacks firewalls directly',
+    ],
+    correctAnswer: 1,
+    points: 10,
+  },
+  {
+    id: 'q17',
+    moduleId: 'intermediate',
+    question: "An employee is tricked into changing a supplier's bank account number. This is an example of:",
+    options: ['Insider attack', 'Account takeover', 'Payment redirection fraud', 'Virus infection'],
+    correctAnswer: 2,
+    points: 10,
+  },
+  {
+    id: 'q18',
+    moduleId: 'intermediate',
+    question: 'Which is a red flag for identity theft on a personal bank account?',
+    options: [
+      'Small, unfamiliar transactions',
+      'Receiving email receipts',
+      'Viewing your bank balance',
+      'Using a budgeting app',
+    ],
+    correctAnswer: 0,
+    points: 10,
+  },
+  {
+    id: 'q19',
+    moduleId: 'intermediate',
+    question: 'What is the purpose of a fraudulent investment scam targeting businesses or individuals?',
+    options: [
+      'To test financial literacy',
+      'To trick people into funding fake opportunities',
+      'To generate leads',
+      'To promote legitimate services',
+    ],
+    correctAnswer: 1,
+    points: 10,
+  },
+  {
+    id: 'q20',
+    moduleId: 'intermediate',
+    question: 'A company storing customer data without proper security may be vulnerable to:',
+    options: ['CEO fraud', 'Data breach', 'Bounced emails', 'Legal software use'],
+    correctAnswer: 1,
+    points: 10,
   },
 ];
 

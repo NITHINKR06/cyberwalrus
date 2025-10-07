@@ -23,7 +23,7 @@ export default function LearningModules() {
   }
 
   const module = selectedModule ? learningModules.find(m => m.id === selectedModule) : null;
-  const moduleQuizzes = module ? quizzes.filter(q => q.moduleId === module.id) : [];
+  const moduleQuizzes = module ? quizzes.filter(q => q.moduleId === module.id || q.moduleId === (module as any).difficulty) : [];
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -49,6 +49,10 @@ export default function LearningModules() {
     setSelectedAnswers([]);
     setQuizCompleted(false);
     setScore(0);
+    // @ts-ignore - dynamic import without types
+    import('gsap').then(({ gsap }) => {
+      gsap.fromTo('.quiz-card', { y: 6, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' });
+    }).catch(() => {});
   };
 
   const handleAnswerSelect = (answerIndex: number) => {
@@ -61,9 +65,6 @@ export default function LearningModules() {
     if (currentQuestion < moduleQuizzes.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      const correctCount = selectedAnswers.reduce((count, answer, index) => {
-        return answer === moduleQuizzes[index].correctAnswer ? count + 1 : count;
-      }, 0);
       const totalPoints = moduleQuizzes.reduce((sum, q) => sum + q.points, 0);
       setScore(totalPoints);
       setQuizCompleted(true);
@@ -179,7 +180,7 @@ export default function LearningModules() {
           {t('modules.backToModules')}
         </button>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+        <div className="bg-white/80 backdrop-blur rounded-xl shadow-lg p-8 mb-6 quiz-card">
           <div className="flex items-start justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{module.title}</h1>
@@ -229,7 +230,7 @@ export default function LearningModules() {
           return (
             <div
               key={module.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200 overflow-hidden"
+              className="bg-white/80 backdrop-blur rounded-xl shadow-sm hover:shadow-lg transition-all cursor-pointer border border-gray-200 overflow-hidden"
               onClick={() => setSelectedModule(module.id)}
             >
               <div className="p-6">
@@ -260,7 +261,7 @@ export default function LearningModules() {
 
               <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
                 <span className="text-sm text-gray-600">
-                  {t('modules.quizQuestions', { count: quizzes.filter(q => q.moduleId === module.id).length })}
+                  {t('modules.quizQuestions', { count: quizzes.filter(q => q.moduleId === module.id || q.moduleId === (module as any).difficulty).length })}
                 </span>
               </div>
             </div>

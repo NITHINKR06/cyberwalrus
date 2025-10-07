@@ -1,6 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { leaderboardData } from '../data/mockData';
 import { Trophy, Medal, Crown, TrendingUp } from 'lucide-react';
 
 export default function Leaderboard() {
@@ -33,13 +32,12 @@ export default function Leaderboard() {
     }
   };
 
-  const userRank = leaderboardData.find(entry => entry.userId === user?.id);
-  const currentUserEntry = userRank || {
+  const currentUserEntry = {
     userId: user?.id || '',
     username: user?.username || '',
     totalPoints: user?.totalPoints || 0,
     level: user?.level || 1,
-    rank: 15,
+    rank: 1,
   };
 
   return (
@@ -61,10 +59,8 @@ export default function Leaderboard() {
               <h3 className="font-bold text-gray-800">{t('leaderboard.yourRank')}</h3>
             </div>
             <div className="text-center py-4">
-              <div className="text-5xl font-bold text-blue-600 mb-2">
-                #{currentUserEntry.rank}
-              </div>
-              <p className="text-sm text-gray-600">{t('leaderboard.outOfUsers', { count: leaderboardData.length })}</p>
+              <div className="text-5xl font-bold text-blue-600 mb-2">#{currentUserEntry.rank}</div>
+              <p className="text-sm text-gray-600">{t('leaderboard.outOfUsers', { count: 1 })}</p>
             </div>
             <div className="pt-4 border-t border-gray-200 space-y-2">
               <div className="flex items-center justify-between text-sm">
@@ -87,7 +83,7 @@ export default function Leaderboard() {
               <div className="flex items-center justify-between">
                 <span>{t('leaderboard.pointsToNext')}</span>
                 <span className="font-bold">
-                  {leaderboardData[currentUserEntry.rank - 2]?.totalPoints - currentUserEntry.totalPoints || 'N/A'}
+                  N/A
                 </span>
               </div>
             </div>
@@ -104,39 +100,30 @@ export default function Leaderboard() {
             </div>
 
             <div className="divide-y divide-gray-200">
-              {leaderboardData.map((entry) => (
-                <div
-                  key={entry.userId}
-                  className={`p-4 border-2 ${getRankBackground(entry.rank)} transition-all hover:shadow-md`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 flex items-center justify-center flex-shrink-0">
-                      {getRankIcon(entry.rank)}
+              <div className={`p-4 border-2 ${getRankBackground(1)} transition-all`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 flex items-center justify-center flex-shrink-0">
+                    {getRankIcon(1)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-800 truncate">
+                        {currentUserEntry.username || 'You'}
+                      </h3>
+                      <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                        {t('leaderboard.you')}
+                      </span>
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-gray-800 truncate">
-                          {entry.username}
-                        </h3>
-                        {entry.userId === user?.id && (
-                          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
-                            {t('leaderboard.you')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-600">{t('common.level', { level: entry.level })}</p>
+                    <p className="text-sm text-gray-600">{t('common.level', { level: currentUserEntry.level })}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="font-bold text-xl text-gray-800">
+                      {currentUserEntry.totalPoints.toLocaleString()}
                     </div>
-
-                    <div className="text-right flex-shrink-0">
-                      <div className="font-bold text-xl text-gray-800">
-                        {entry.totalPoints.toLocaleString()}
-                      </div>
-                      <p className="text-xs text-gray-600">{t('leaderboard.points')}</p>
-                    </div>
+                    <p className="text-xs text-gray-600">{t('leaderboard.points')}</p>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
@@ -146,9 +133,7 @@ export default function Leaderboard() {
                 <Crown className="w-10 h-10 text-yellow-500" />
                 <div>
                   <p className="text-sm text-gray-600">{t('leaderboard.topScore')}</p>
-                  <p className="text-lg font-bold text-gray-800">
-                    {leaderboardData[0]?.totalPoints.toLocaleString()}
-                  </p>
+                  <p className="text-lg font-bold text-gray-800">{currentUserEntry.totalPoints.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -158,9 +143,7 @@ export default function Leaderboard() {
                 <TrendingUp className="w-10 h-10 text-blue-500" />
                 <div>
                   <p className="text-sm text-gray-600">{t('leaderboard.averagePoints')}</p>
-                  <p className="text-lg font-bold text-gray-800">
-                    {Math.round(leaderboardData.reduce((sum, e) => sum + e.totalPoints, 0) / leaderboardData.length).toLocaleString()}
-                  </p>
+                  <p className="text-lg font-bold text-gray-800">{currentUserEntry.totalPoints.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -170,9 +153,7 @@ export default function Leaderboard() {
                 <Trophy className="w-10 h-10 text-green-500" />
                 <div>
                   <p className="text-sm text-gray-600">{t('leaderboard.activeUsers')}</p>
-                  <p className="text-lg font-bold text-gray-800">
-                    {leaderboardData.length}
-                  </p>
+                  <p className="text-lg font-bold text-gray-800">1</p>
                 </div>
               </div>
             </div>

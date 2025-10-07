@@ -1,5 +1,6 @@
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import { Trophy, Target, Flame, Award, TrendingUp, Shield, Activity } from 'lucide-react';
 import { badges, achievements } from '../data/mockData';
 import { 
@@ -14,6 +15,16 @@ import {
 export default function Dashboard() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  // Subtle entrance animations
+  useEffect(() => {
+    let isMounted = true;
+    // @ts-ignore - dynamic import without types
+    import('gsap').then(({ gsap }) => {
+      if (!isMounted) return;
+      gsap.to('.dash-fade-up', { y: 0, opacity: 1, duration: 0.6, stagger: 0.06, ease: 'power3.out' });
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
 
   if (!user) return null;
 
@@ -51,7 +62,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+        <div className="dash-fade-up opacity-0 translate-y-3 bg-white/70 backdrop-blur rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">{t('dashboard.totalPoints')}</h3>
             <Trophy className="w-5 h-5 text-blue-500" />
@@ -60,7 +71,7 @@ export default function Dashboard() {
           <p className="text-xs text-gray-500 mt-1">{t('dashboard.keepLearning')}</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+        <div className="dash-fade-up opacity-0 translate-y-3 bg-white/70 backdrop-blur rounded-xl shadow-sm p-6 border-l-4 border-green-500">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">{t('dashboard.currentLevel')}</h3>
             <TrendingUp className="w-5 h-5 text-green-500" />
@@ -74,7 +85,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500">
+        <div className="dash-fade-up opacity-0 translate-y-3 bg-white/70 backdrop-blur rounded-xl shadow-sm p-6 border-l-4 border-orange-500">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">{t('dashboard.currentStreak')}</h3>
             <Flame className="w-5 h-5 text-orange-500" />
@@ -85,7 +96,7 @@ export default function Dashboard() {
           <p className="text-xs text-gray-500 mt-1">{t('dashboard.maintainStreak')}</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
+        <div className="dash-fade-up opacity-0 translate-y-3 bg-white/70 backdrop-blur rounded-xl shadow-sm p-6 border-l-4 border-purple-500">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">{t('dashboard.badgesEarned')}</h3>
             <Award className="w-5 h-5 text-purple-500" />

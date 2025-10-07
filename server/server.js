@@ -52,9 +52,12 @@ app.use((req, res, next) => {
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/walrus_db')
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/walrus_db';
+const mongoDbName = process.env.MONGODB_DBNAME; // optional override
+mongoose.connect(mongoUri, mongoDbName ? { dbName: mongoDbName } : undefined)
   .then(() => {
-    console.log('Connected to MongoDB');
+    const conn = mongoose.connection;
+    console.log(`Connected to MongoDB: host=${conn.host} db=${conn.name}`);
   }).catch(err => {
     console.error('MongoDB connection error:', err);
   });

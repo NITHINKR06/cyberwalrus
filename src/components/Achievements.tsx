@@ -3,13 +3,26 @@ import { useTranslation } from 'react-i18next';
 import { achievements } from '../data/mockData';
 import { Award, Lock, CheckCircle, Star } from 'lucide-react';
 import * as Icons from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { userService } from '../services/backendApi';
 
 export default function Achievements() {
   const { user } = useAuth();
   const { t } = useTranslation();
-
   const completedModules = user ? Math.floor((user.totalPoints / 150) * 0.6) : 0;
-  const totalReports = 0;
+  const [totalReports, setTotalReports] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    userService.getStats()
+      .then((stats: any) => {
+        if (!mounted) return;
+        const reports = stats?.activity?.totalReports ?? 0;
+        setTotalReports(reports);
+      })
+      .catch(() => setTotalReports(0));
+    return () => { mounted = false; };
+  }, []);
 
   const getAchievementStatus = (achievement: typeof achievements[0]) => {
     if (!user) return { unlocked: false, progress: 0 };

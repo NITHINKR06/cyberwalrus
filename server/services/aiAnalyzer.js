@@ -29,28 +29,47 @@ class AIAnalyzerService {
         }
       );
 
-      // Process Hugging Face response
       const results = response.data[0];
       const toxicityScore = results.find(r => r.label === 'TOXIC')?.score || 0;
       const severityScore = results.find(r => r.label === 'SEVERE_TOXIC')?.score || 0;
       
-      // Determine threat level based on scores
-      let threatLevel = 'safe';
-      if (severityScore > 0.7 || toxicityScore > 0.8) {
-        threatLevel = 'dangerous';
-      } else if (toxicityScore > 0.5) {
-        threatLevel = 'suspicious';
-      }
+      // --- NEW CONFIDENCE LOGIC ---
+      const DANGEROUS_THRESHOLD = 0.8;
+      const SUSPICIOUS_THRESHOLD = 0.4;
+      
+      // Give more weight to severe toxicity
+      const weightedScore = (toxicityScore * 0.6) + (severityScore * 1.0);
 
+      let threatLevel = 'safe';
+      let confidence = 0;
+
+      if (weightedScore >= DANGEROUS_THRESHOLD) {
+        threatLevel = 'dangerous';
+        // Confidence scales from 85% to 99% within the dangerous range
+        confidence = 85 + (weightedScore - DANGEROUS_THRESHOLD) * 25;
+      } else if (weightedScore >= SUSPICIOUS_THRESHOLD) {
+        threatLevel = 'suspicious';
+        // Confidence scales from 70% to 84% within the suspicious range
+        const range = DANGEROUS_THRESHOLD - SUSPICIOUS_THRESHOLD;
+        confidence = 70 + ((weightedScore - SUSPICIOUS_THRESHOLD) / range) * 14;
+      } else {
+        threatLevel = 'safe';
+        // Confidence is higher for lower scores (e.g., 0 score = 100% confidence it's safe)
+        confidence = 100 - (weightedScore / SUSPICIOUS_THRESHOLD) * 20;
+      }
+      
       return {
         threatLevel,
-        confidence: Math.round((Math.max(toxicityScore, severityScore) * 100)),
+        confidence: Math.round(Math.min(confidence, 99)), // Cap confidence at 99%
         scores: {
           toxicity: toxicityScore,
-          severity: severityScore
+          severity: severityScore,
+          weightedScore: weightedScore
         },
         source: 'huggingface'
       };
+      // --- END OF NEW LOGIC ---
+
     } catch (error) {
       console.log('Hugging Face API error:', error.message);
       return this.fallbackTextAnalysis(text);
@@ -81,7 +100,6 @@ class AIAnalyzerService {
         }
       );
 
-      // Process Google Safe Browsing response
       if (response.data.matches && response.data.matches.length > 0) {
         const threats = response.data.matches;
         const threatTypes = threats.map(t => t.threatType);
@@ -107,7 +125,7 @@ class AIAnalyzerService {
     }
   }
 
-  // Generate summary using Gemini AI
+// Generate summary using Gemini AI
   async generateSummaryWithGemini(analysisData) {
     try {
       if (!this.geminiApiKey) {
@@ -132,9 +150,9 @@ class AIAnalyzerService {
         Keep the response concise and user-friendly.
       `;
 
-      // UPDATED: Changed model from gemini-pro to gemini-2.5-flash for better reliability
+      // FINAL FIX: Using the standard and basic 'gemini-1.0-pro' model
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro:generateContent?key=${this.geminiApiKey}`,
         {
           contents: [{
             parts: [{
@@ -220,22 +238,18 @@ class AIAnalyzerService {
 
     try {
       if (inputType === 'url') {
-        // Analyze URL with Google Safe Browsing
         const urlAnalysis = await this.analyzeUrlWithGoogleSafeBrowsing(inputContent);
         analysisResult = { ...analysisResult, ...urlAnalysis };
         
-        // Add URL-specific recommendations
         analysisResult.recommendations = [
           'Always verify URLs before clicking',
           'Look for HTTPS and valid SSL certificates',
           'Check the domain carefully for typos'
         ];
       } else {
-        // Analyze text with Hugging Face
         const textAnalysis = await this.analyzeTextWithHuggingFace(inputContent);
         analysisResult = { ...analysisResult, ...textAnalysis };
         
-        // Add text-specific recommendations
         analysisResult.recommendations = [
           'Never share passwords or sensitive information',
           'Verify sender identity through official channels',
@@ -243,7 +257,6 @@ class AIAnalyzerService {
         ];
       }
 
-      // Generate indicators based on analysis
       if (analysisResult.threatLevel === 'dangerous') {
         analysisResult.indicators.push('High risk content detected');
         if (analysisResult.threats) {
@@ -255,10 +268,8 @@ class AIAnalyzerService {
         analysisResult.indicators.push('No immediate threats detected');
       }
 
-      // Generate AI summary
       analysisResult.summary = await this.generateSummaryWithGemini(analysisResult);
 
-      // Add threat-level specific recommendations
       if (analysisResult.threatLevel === 'dangerous') {
         analysisResult.recommendations.unshift('⚠️ HIGH RISK: Do not interact with this content');
         analysisResult.recommendations.push('Report this to relevant authorities');
@@ -270,7 +281,6 @@ class AIAnalyzerService {
 
     } catch (error) {
       console.error('Analysis error:', error);
-      // Use fallback analysis
       if (inputType === 'url') {
         const fallback = this.fallbackUrlAnalysis(inputContent);
         analysisResult = { ...analysisResult, ...fallback };

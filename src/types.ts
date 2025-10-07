@@ -24,7 +24,7 @@ export interface Quiz {
   question: string;
   options: string[];
   correctAnswer: number;
-  explanation: string;
+  explanation?: string;
   points: number;
 }
 
