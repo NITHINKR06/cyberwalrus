@@ -44,19 +44,35 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
     
     setIsSearching(true);
     try {
-      // First try with Karnataka focus
-      let response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + ', Karnataka, India')}&limit=5&countrycodes=in`
-      );
-      
-      // If no results, try broader search in India
-      if (response.data.length === 0) {
-        response = await axios.get(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery + ', India')}&limit=5&countrycodes=in`
-        );
+      // First try postal API for post office name search
+      if (!/^\d{6}$/.test(searchQuery.trim())) {
+        try {
+          const postalResponse = await axios.get(
+            `https://api.postalpincode.in/postoffice/${encodeURIComponent(searchQuery)}`
+          );
+          
+          if (postalResponse.data && postalResponse.data.Status === 'Success' && postalResponse.data.PostOffice) {
+            // Convert postal API results to our format
+            const postalResults = postalResponse.data.PostOffice.map((postOffice: any) => ({
+              display_name: `${postOffice.Name}, ${postOffice.District}, ${postOffice.State}`,
+              lat: 0, // Postal API doesn't provide coordinates
+              lon: 0,
+              type: 'post_office',
+              importance: 0.9,
+              postOffice: postOffice
+            }));
+            setSearchResults(postalResults);
+            setIsSearching(false);
+            return;
+          }
+        } catch (postalError) {
+          console.log('Postal API search failed, trying fallback');
+        }
       }
       
-      setSearchResults(response.data);
+      // Fallback to manual suggestions for Karnataka
+      const fallbackResults = getFallbackResults(searchQuery);
+      setSearchResults(fallbackResults);
     } catch (error) {
       console.error('Search error:', error);
       // Fallback to manual suggestions for Karnataka
@@ -117,7 +133,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
           tehsil: postOffice.Division || '',
           district: postOffice.District || '',
           state: postOffice.State || 'Karnataka',
-          pincode: pincode,
+          pincode: pincode, // Ensure pincode is filled
           country: postOffice.Country || 'India',
         };
         
@@ -151,26 +167,54 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
 
   const handleLocationSelect = async (place: any) => {
     try {
-      // Get detailed address information
-      const response = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
-      );
+      // If it's a postal API result, use the post office data directly
+      if (place.postOffice) {
+        const postOffice = place.postOffice;
+        onLocationSelect({
+          houseNo: '',
+          streetName: '',
+          village: postOffice.Name || '',
+          tehsil: postOffice.Division || '',
+          district: postOffice.District || '',
+          state: postOffice.State || 'Karnataka',
+          pincode: postOffice.PINCode || '', // Fill pincode from postal API
+          country: postOffice.Country || 'India',
+        });
+        onClose();
+        return;
+      }
       
+      // For other results, try to get detailed address information
+      if (place.lat && place.lon) {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
+        );
+        
           const address = response.data.address;
           onLocationSelect({
             houseNo: address.house_number || '',
             streetName: address.road || '',
-        village: address.village || address.town || address.city || '',
-        tehsil: address.county || address.suburb || '',
-        district: address.state_district || address.city_district || '',
-        state: address.state || 'Karnataka',
+          village: address.village || address.town || address.city || '',
+          tehsil: address.county || address.suburb || '',
+          district: address.state_district || address.city_district || '',
+          state: address.state || 'Karnataka',
             pincode: address.postcode || '',
-        country: address.country || 'India',
-      });
+          country: address.country || 'India',
+        });
+      } else {
+        // Fallback to basic information from display name
+        const parts = place.display_name.split(',');
+        onLocationSelect({
+          village: parts[0]?.trim() || '',
+          district: parts[1]?.trim() || '',
+          state: 'Karnataka',
+          country: 'India',
+        });
+      }
       
       onClose();
     } catch (error) {
-      console.error('Reverse geocoding error:', error);
+      console.error('Location selection error:', error);
       // Fallback to basic information from display name
       const parts = place.display_name.split(',');
       onLocationSelect({
@@ -347,11 +391,12 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-800 mb-2">Search Tips:</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• <strong>Enter 6-digit pincode</strong> (e.g., 574110) for auto-fetch</li>
+              <li>• <strong>Enter 6-digit pincode</strong> (e.g., 574110) for auto-fetch from postal database</li>
+              <li>• <strong>Search post office names</strong> (e.g., "New Delhi GPO", "Bangalore GPO")</li>
               <li>• Focus on Karnataka locations for best results</li>
               <li>• Include city and state for better results</li>
               <li>• Try different spellings if no results found</li>
-              <li>• Examples: "574110", "Bangalore, Karnataka", "Mysore, Karnataka"</li>
+              <li>• Examples: "574110", "New Delhi GPO", "Bangalore, Karnataka", "Mysore, Karnataka"</li>
             </ul>
           </div>
         </div>

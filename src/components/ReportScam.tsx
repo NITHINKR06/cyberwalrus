@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 // import { useAuth } from '../contexts/AuthContext';
 import { AlertTriangle, CheckCircle, Send, MapPin, Phone, Shield, Download, Map } from 'lucide-react';
 import { submitScamReport, reportService } from '../services/backendApi';
@@ -39,6 +39,9 @@ export default function ReportScam() {
   const [submittedReport, setSubmittedReport] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPincodeLoading, setIsPincodeLoading] = useState(false);
+  const [pincodeSuccess, setPincodeSuccess] = useState<string | null>(null);
+  const pincodeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [formKey, setFormKey] = useState(0);
 
   const scamTypes = [
     'Phishing Email', 'Fake Website', 'Phone Scam', 'SMS Scam', 'Social Media Scam',
@@ -47,6 +50,11 @@ export default function ReportScam() {
   ];
 
   const genders = ['Male', 'Female', 'Other'];
+
+  // Debug: Log form data changes
+  useEffect(() => {
+    console.log('Form data updated:', formData);
+  }, [formData]);
   const states = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
     'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
@@ -129,10 +137,97 @@ export default function ReportScam() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const newValue = e.target.value;
+    const fieldName = e.target.name;
+    console.log(`Form field changed: ${fieldName} = "${newValue}"`);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [fieldName]: newValue,
     });
+
+    // Clear success message when pincode changes
+    if (e.target.name === 'pincode') {
+      setPincodeSuccess(null);
+    }
+
+    // Auto-trigger pincode search when 6 digits are entered (with debounce)
+    if (e.target.name === 'pincode' && newValue.length === 6 && /^\d{6}$/.test(newValue)) {
+      // Clear existing timeout
+      if (pincodeTimeoutRef.current) {
+        clearTimeout(pincodeTimeoutRef.current);
+      }
+      
+      // Set new timeout for debounced auto-fill
+      pincodeTimeoutRef.current = setTimeout(() => {
+        handlePincodeAutoFill(newValue);
+      }, 500); // 0.5 second delay
+    }
+  };
+
+  const handlePincodeAutoFill = async (pincode: string) => {
+    if (!pincode || pincode.length !== 6 || !/^\d{6}$/.test(pincode)) return;
+    
+    setIsPincodeLoading(true);
+    try {
+      console.log('Auto-filling pincode:', pincode);
+      // Search by pincode using Postal PIN Code API
+      const response = await fetch(
+        `https://api.postalpincode.in/pincode/${pincode}`
+      );
+      const data = await response.json();
+      
+      console.log('API Response:', data);
+      console.log('Is Array:', Array.isArray(data));
+      
+      // Handle both single object and array responses
+      const responseData = Array.isArray(data) ? data[0] : data;
+      console.log('Response Data:', responseData);
+      
+      if (responseData && responseData.Status === 'Success' && responseData.PostOffice && responseData.PostOffice.length > 0) {
+        const postOffice = responseData.PostOffice[0]; // Use first post office data
+        console.log('Post Office Data:', postOffice);
+        console.log('Post Office Name:', postOffice.Name);
+        console.log('Post Office District:', postOffice.District);
+        console.log('Post Office State:', postOffice.State);
+        
+        // Update form with detailed address from postal API
+        const newFormData = {
+          houseNo: '',
+          streetName: '',
+          village: postOffice.Name || '',
+          tehsil: postOffice.Division || '',
+          district: postOffice.District || '',
+          state: postOffice.State || 'Karnataka',
+          country: postOffice.Country || 'India',
+          pincode: pincode, // Keep the entered pincode
+        };
+        console.log('Updating form with:', newFormData);
+        
+        setFormData(prev => {
+          const updatedData = {
+            ...prev,
+            ...newFormData,
+          };
+          console.log('Updated form data:', updatedData);
+          return updatedData;
+        });
+        
+        // Force form re-render
+        setFormKey(prev => prev + 1);
+        
+        // Show success message
+        setPincodeSuccess(`Location found: ${postOffice.Name}, ${postOffice.District}, ${postOffice.State}`);
+        setTimeout(() => setPincodeSuccess(null), 5000); // Clear after 5 seconds
+      } else {
+        // Pincode not found - just leave fields as they are
+        console.log('Pincode not found in postal database, leaving fields unchanged');
+      }
+    } catch (error) {
+      console.error('Pincode search error:', error);
+      // On error, just leave fields as they are
+    } finally {
+      setIsPincodeLoading(false);
+    }
   };
 
   const handleLocationSelect = (address: any) => {
@@ -270,7 +365,7 @@ export default function ReportScam() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
+          <form key={formKey} onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
             <div className="space-y-8">
               {/* Scam Report Section */}
               <div className="border-b border-gray-200 pb-6">
@@ -282,7 +377,8 @@ export default function ReportScam() {
                     </label>
                     <select
                       name="scamType" value={formData.scamType} onChange={handleChange} required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                      style={{color: '#111827'}}
                     >
                       <option value="">Select a scam type</option>
                       {scamTypes.map(type => (<option key={type} value={type}>{type}</option>))}
@@ -295,8 +391,9 @@ export default function ReportScam() {
                     </label>
                     <textarea
                       name="description" value={formData.description} onChange={handleChange} required rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-gray-900"
                       placeholder="Please provide as much detail as possible about the scam..."
+                      style={{color: '#111827'}}
                     />
                   </div>
 
@@ -304,15 +401,17 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
                       <input type="url" name="url" value={formData.url} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="https://example.com"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                       <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="+1 (555) 123-4567"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -321,14 +420,16 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                       <input type="email" name="email" value={formData.email} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="scammer@example.com"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Severity *</label>
                       <select name="severity" value={formData.severity} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        style={{color: '#111827'}}
                       >
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
@@ -347,15 +448,17 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                       <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Enter your full name"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
                       <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="9876543210"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -363,7 +466,8 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
                       <select name="gender" value={formData.gender} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        style={{color: '#111827'}}
                       >
                         <option value="">Select Gender</option>
                         {genders.map(gender => (<option key={gender} value={gender}>{gender}</option>))}
@@ -372,14 +476,16 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                       <input type="date" name="dob" value={formData.dob} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                       <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="your@email.com"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -387,15 +493,17 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Spouse Name</label>
                       <input type="text" name="spouse" value={formData.spouse} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Spouse name if applicable"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Relation with Victim</label>
                       <input type="text" name="relationWithVictim" value={formData.relationWithVictim} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Self/Spouse/Parent/Guardian"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -418,15 +526,17 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">House No.</label>
                       <input type="text" name="houseNo" value={formData.houseNo} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="House/Flat number"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Street Name *</label>
                       <input type="text" name="streetName" value={formData.streetName} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Street/Lane name"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -434,15 +544,17 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Colony/Area</label>
                       <input type="text" name="colony" value={formData.colony} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Colony/Area name"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Village/Town *</label>
                       <input type="text" name="village" value={formData.village} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Village/Town name"
+                        style={{backgroundColor: formData.village ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -450,21 +562,24 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tehsil *</label>
                       <input type="text" name="tehsil" value={formData.tehsil} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Tehsil name"
+                        style={{backgroundColor: formData.tehsil ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">District *</label>
                       <input type="text" name="district" value={formData.district} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="District name"
+                        style={{backgroundColor: formData.district ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
                       <select name="state" value={formData.state} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                        style={{color: '#111827'}}
                       >
                         <option value="">Select State</option>
                         {states.map(state => (<option key={state} value={state}>{state}</option>))}
@@ -475,90 +590,41 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Police Station *</label>
                       <input type="text" name="policeStation" value={formData.policeStation} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Police station name"
+                        style={{color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
                       <div className="flex gap-2">
-                        <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
-                          className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="6-digit pincode" maxLength={6}
-                        />
-                        {formData.pincode.length === 6 && /^\d{6}$/.test(formData.pincode) && (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              setIsPincodeLoading(true);
-                              try {
-                                // Search by pincode using Postal PIN Code API
-                                const response = await fetch(
-                                  `https://api.postalpincode.in/pincode/${formData.pincode}`
-                                );
-                                const data = await response.json();
-                                
-                                if (data && data.Status === 'Success' && data.PostOffice && data.PostOffice.length > 0) {
-                                  const postOffice = data.PostOffice[0]; // Use first post office data
-                                  
-                                  // Update form with detailed address from postal API
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    houseNo: '',
-                                    streetName: '',
-                                    village: postOffice.Name || '',
-                                    tehsil: postOffice.Division || '',
-                                    district: postOffice.District || '',
-                                    state: postOffice.State || 'Karnataka',
-                                    country: postOffice.Country || 'India',
-                                  }));
-                                  
-                                  // Show success message
-                                  alert(`Location found and filled for pincode ${formData.pincode}! Found: ${postOffice.Name}, ${postOffice.District}, ${postOffice.State}`);
-                                } else {
-                                  // Fallback: use pincode as is
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    village: `Area with pincode ${formData.pincode}`,
-                                    state: 'Karnataka',
-                                    country: 'India',
-                                  }));
-                                  alert(`Pincode ${formData.pincode} not found in postal database. Using basic location info.`);
-                                }
-                              } catch (error) {
-                                console.error('Pincode search error:', error);
-                                // Fallback: use pincode as is
-                                setFormData(prev => ({
-                                  ...prev,
-                                  village: `Area with pincode ${formData.pincode}`,
-                                  state: 'Karnataka',
-                                  country: 'India',
-                                }));
-                                alert(`Error fetching location for pincode ${formData.pincode}. Using basic location info.`);
-                              } finally {
-                                setIsPincodeLoading(false);
-                              }
-                            }}
-                            className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            disabled={isPincodeLoading}
-                          >
-                            {isPincodeLoading ? (
-                              <>
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                Loading...
-                              </>
-                            ) : (
-                              'Auto-fill'
-                            )}
-                          </button>
+                        <div className="flex-1 relative">
+                          <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                            placeholder="6-digit pincode" maxLength={6}
+                            style={{color: '#111827'}}
+                          />
+                          {isPincodeLoading && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                        </div>
+                        {pincodeSuccess && (
+                          <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-lg">
+                            <p className="text-sm text-green-800">
+                              ✅ {pincodeSuccess}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
                       <input type="text" name="country" value={formData.country} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                         placeholder="Country"
+                        style={{color: '#111827'}}
                       />
                     </div>
                   </div>
