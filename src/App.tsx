@@ -44,16 +44,16 @@ function AppContent() {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-midnight-900">
+      <nav className="sticky top-0 z-50 bg-[rgba(15,23,42,0.7)] backdrop-blur-md border-b border-glass">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-2 rounded-lg">
+                <div className="p-2 rounded-xl shadow-neon bg-gradient-to-br from-indigo-600 to-cyan-500">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold text-gray-800">WALRUS</span>
+                <span className="text-xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300">WALRUS</span>
               </div>
             </div>
 
@@ -64,10 +64,10 @@ function AppContent() {
                   <button
                     key={item.id}
                     onClick={() => setCurrentView(item.id as any)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
                       currentView === item.id
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'btn-primary'
+                        : 'btn-secondary'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -80,23 +80,23 @@ function AppContent() {
             <div className="flex items-center gap-4">
               <LanguageSwitcher />
               
-              <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-gray-100 rounded-lg">
+              <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-white/5 border border-glass rounded-xl">
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">{user.username}</p>
-                  <p className="text-xs text-gray-600">{t('common.level', { level: user.level })}</p>
+                  <p className="text-sm font-semibold text-slate-100">{user.username}</p>
+                  <p className="text-xs text-slate-400">{t('common.level', { level: user.level })}</p>
                 </div>
               </div>
 
               <button
                 onClick={logout}
-                className="hidden md:flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="hidden md:flex items-center gap-2 px-4 py-2 btn-secondary"
               >
                 <LogOut className="w-5 h-5" />
               </button>
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+                className="md:hidden p-2 rounded-xl text-slate-200 bg-white/5 border border-glass"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -105,7 +105,7 @@ function AppContent() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="md:hidden border-t border-glass bg-[rgba(15,23,42,0.85)] backdrop-blur-md">
             <div className="px-4 py-2 space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
@@ -116,10 +116,8 @@ function AppContent() {
                       setCurrentView(item.id as any);
                       setMobileMenuOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
-                      currentView === item.id
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+                      currentView === item.id ? 'btn-primary' : 'btn-secondary'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -129,7 +127,7 @@ function AppContent() {
               })}
               <button
                 onClick={logout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium btn-secondary"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
@@ -139,7 +137,7 @@ function AppContent() {
         )}
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'modules' && <LearningModules />}
         {currentView === 'achievements' && <Achievements />}
@@ -158,7 +156,7 @@ function AppContent() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="dark"
       />
     </div>
   );
