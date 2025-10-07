@@ -7,8 +7,8 @@
     /* Light theme defaults */
     --bg-midnight: 245 247 255; /* light panel */
     --bg-panel: 255 255 255;
-    --text-primary: 15 23 42; /* slate-900 */
-    --text-secondary: 71 85 105; /* slate-600 */
+    --text-primary: 17 24 39; /* gray-900 - better contrast */
+    --text-secondary: 55 65 81; /* gray-700 - better contrast */
     /* Brand gradient (light) */
     --primary-start: 99 102 241;   /* indigo-500 */
     --primary-mid: 14 165 233;     /* sky-500 */
@@ -26,8 +26,8 @@
   .dark {
     --bg-midnight: 11 16 32; /* #0b1020 */
     --bg-panel: 15 23 42;    /* #0f172a */
-    --text-primary: 226 232 240; /* slate-200 */
-    --text-secondary: 148 163 184; /* slate-400 */
+    --text-primary: 249 250 251; /* gray-50 - better contrast */
+    --text-secondary: 209 213 219; /* gray-300 - better contrast */
     /* Brand gradient (dark - more saturated) */
     --primary-start: 129 140 248;  /* indigo-400 */
     --primary-mid: 56 189 248;     /* sky-400 */
@@ -102,12 +102,12 @@
   .btn-nav {
     @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium border transition-colors;
     background-color: rgba(0,0,0,0.05);
-    color: rgb(var(--text-primary));
+    color: #1f2937; /* gray-800 for better contrast */
     border-color: rgba(0,0,0,0.08);
   }
   .dark .btn-nav {
     background-color: rgba(255,255,255,0.05);
-    color: rgb(var(--text-primary));
+    color: #f9fafb; /* gray-50 for better contrast */
     border-color: rgba(255,255,255,0.12);
   }
   .btn-nav-active {
@@ -122,12 +122,12 @@
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold border transition-all duration-200;
     background-color: rgba(0,0,0,0.05);
-    color: rgb(var(--text-primary));
+    color: #1f2937; /* gray-800 for better contrast */
     border-color: rgba(0,0,0,0.08);
   }
   .dark .btn-secondary {
     background-color: rgba(255,255,255,0.05);
-    color: rgb(var(--text-primary));
+    color: #f9fafb; /* gray-50 for better contrast */
     border-color: rgba(255,255,255,0.12);
   }
   .card {

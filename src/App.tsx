@@ -5,7 +5,7 @@ import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
 import LearningModules from './components/LearningModules';
 import Achievements from './components/Achievements';
-import Leaderboard from './components/Leaderboard';
+// import Leaderboard from './components/Leaderboard';
 import ReportScam from './components/ReportScam';
 import ScamAnalyzer from './components/ScamAnalyzer';
 import SecuritySandbox from './components/SecuritySandbox'; // 1. IMPORT THE NEW COMPONENT
@@ -16,7 +16,7 @@ import {
   LayoutDashboard,
   BookOpen,
   Award,
-  Trophy,
+  // Trophy,
   AlertTriangle,
   LogOut,
   Menu,
@@ -100,8 +100,8 @@ function AppContent() {
               
               <div className="hidden md:flex items-center gap-3 px-4 py-2 bg-white/5 border border-glass rounded-xl">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{user.username}</p>
-                  <p className="text-xs text-slate-400">{t('common.level', { level: user.level })}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.username}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">{t('common.level', { level: user.level })}</p>
                 </div>
               </div>
 
@@ -114,14 +114,14 @@ function AppContent() {
 
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-xl text-slate-200 bg-white/5 border border-glass"
+                className="md:hidden p-2 rounded-xl text-gray-900 dark:text-white bg-white/5 border border-glass"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
               <button
                 onClick={() => setIsDark(v => !v)}
                 aria-label="Toggle theme"
-                className="p-2 rounded-xl border border-glass bg-white/5 text-slate-200 hover:bg-white/10"
+                className="p-2 rounded-xl border border-glass bg-white/5 text-gray-900 dark:text-white hover:bg-white/10"
               >
                 {isDark ? '🌙' : '🌞'}
               </button>

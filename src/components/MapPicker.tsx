@@ -101,31 +101,24 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
     
     setIsPincodeSearching(true);
     try {
-      // Search by pincode using Nominatim
+      // Search by pincode using Postal PIN Code API
       const response = await axios.get(
-        `https://nominatim.openstreetmap.org/search?format=json&postalcode=${pincode}&countrycodes=in&limit=1`
+        `https://api.postalpincode.in/pincode/${pincode}`
       );
       
-      if (response.data.length > 0) {
-        const place = response.data[0];
+      if (response.data && response.data.Status === 'Success' && response.data.PostOffice && response.data.PostOffice.length > 0) {
+        const postOffice = response.data.PostOffice[0]; // Use first post office data
         
-        // Get detailed address information using reverse geocoding
-        const reverseResponse = await axios.get(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
-        );
-        
-        const address = reverseResponse.data.address;
-        
-        // Parse the address components properly
+        // Parse the address components from postal API
         const locationData = {
-          houseNo: address.house_number || '',
-          streetName: address.road || address.pedestrian || '',
-          village: address.village || address.town || address.city || address.suburb || '',
-          tehsil: address.county || address.suburb || '',
-          district: address.state_district || address.city_district || address.county || '',
-          state: address.state || 'Karnataka',
+          houseNo: '',
+          streetName: '',
+          village: postOffice.Name || '',
+          tehsil: postOffice.Division || '',
+          district: postOffice.District || '',
+          state: postOffice.State || 'Karnataka',
           pincode: pincode,
-          country: address.country || 'India',
+          country: postOffice.Country || 'India',
         };
         
         console.log('Pincode search result:', locationData);

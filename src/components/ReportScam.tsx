@@ -492,37 +492,29 @@ export default function ReportScam() {
                             onClick={async () => {
                               setIsPincodeLoading(true);
                               try {
-                                // Search by pincode using Nominatim
+                                // Search by pincode using Postal PIN Code API
                                 const response = await fetch(
-                                  `https://nominatim.openstreetmap.org/search?format=json&postalcode=${formData.pincode}&countrycodes=in&limit=1`
+                                  `https://api.postalpincode.in/pincode/${formData.pincode}`
                                 );
                                 const data = await response.json();
                                 
-                                if (data.length > 0) {
-                                  const place = data[0];
+                                if (data && data.Status === 'Success' && data.PostOffice && data.PostOffice.length > 0) {
+                                  const postOffice = data.PostOffice[0]; // Use first post office data
                                   
-                                  // Get detailed address information using reverse geocoding
-                                  const reverseResponse = await fetch(
-                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
-                                  );
-                                  const reverseData = await reverseResponse.json();
-                                  
-                                  const address = reverseData.address;
-                                  
-                                  // Update form with detailed address
+                                  // Update form with detailed address from postal API
                                   setFormData(prev => ({
                                     ...prev,
-                                    houseNo: address.house_number || '',
-                                    streetName: address.road || address.pedestrian || '',
-                                    village: address.village || address.town || address.city || address.suburb || '',
-                                    tehsil: address.county || address.suburb || '',
-                                    district: address.state_district || address.city_district || address.county || '',
-                                    state: address.state || 'Karnataka',
-                                    country: address.country || 'India',
+                                    houseNo: '',
+                                    streetName: '',
+                                    village: postOffice.Name || '',
+                                    tehsil: postOffice.Division || '',
+                                    district: postOffice.District || '',
+                                    state: postOffice.State || 'Karnataka',
+                                    country: postOffice.Country || 'India',
                                   }));
                                   
                                   // Show success message
-                                  alert(`Location found and filled for pincode ${formData.pincode}!`);
+                                  alert(`Location found and filled for pincode ${formData.pincode}! Found: ${postOffice.Name}, ${postOffice.District}, ${postOffice.State}`);
                                 } else {
                                   // Fallback: use pincode as is
                                   setFormData(prev => ({
@@ -531,7 +523,7 @@ export default function ReportScam() {
                                     state: 'Karnataka',
                                     country: 'India',
                                   }));
-                                  alert(`Pincode ${formData.pincode} not found in database. Using basic location info.`);
+                                  alert(`Pincode ${formData.pincode} not found in postal database. Using basic location info.`);
                                 }
                               } catch (error) {
                                 console.error('Pincode search error:', error);
