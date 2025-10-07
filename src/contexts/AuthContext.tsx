@@ -5,6 +5,7 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
+  updateUser: (updateData: { username?: string; email?: string; currentPassword?: string; newPassword?: string }) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -128,6 +129,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateUser = async (updateData: { username?: string; email?: string; currentPassword?: string; newPassword?: string }) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${API_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update profile');
+      }
+
+      const data = await response.json();
+      
+      // Update user data in context
+      setUser({
+        id: data.user.id,
+        username: data.user.username,
+        email: data.user.email,
+        totalPoints: data.user.totalPoints || 0,
+        currentStreak: data.user.currentStreak || 0,
+        level: data.user.level || 1,
+      });
+    } catch (error) {
+      console.error('Profile update error:', error);
+      throw error;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authToken');
@@ -139,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, updateUser, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -65,8 +65,8 @@ export default function AppLayout() {
   ];
 
   const userMenuItems = [
-    { id: 'profile', name: 'Profile', icon: User, onClick: () => navigate('/dashboard') },
-    { id: 'settings', name: 'Settings', icon: Settings, onClick: () => navigate('/dashboard') },
+    { id: 'profile', name: 'Profile', icon: User, onClick: () => navigate('/profile') },
+    { id: 'settings', name: 'Settings', icon: Settings, onClick: () => navigate('/settings') },
     { id: 'logout', name: 'Logout', icon: LogOut, onClick: logout },
   ];
 

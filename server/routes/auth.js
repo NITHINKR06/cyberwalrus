@@ -166,6 +166,74 @@ router.get('/verify', authenticateToken, async (req, res) => {
   }
 });
 
+// Update profile
+router.put('/profile', authenticateToken, async (req, res) => {
+  try {
+    const { username, email, currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if username or email is being changed and if they already exist
+    if (username && username !== user.username) {
+      const existingUser = await User.findOne({ 
+        username, 
+        _id: { $ne: user._id } 
+      });
+      if (existingUser) {
+        return res.status(400).json({ error: 'Username already taken' });
+      }
+      user.username = username;
+    }
+
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ 
+        email, 
+        _id: { $ne: user._id } 
+      });
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+      user.email = email;
+    }
+
+    // Handle password change
+    if (newPassword) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: 'Current password is required' });
+      }
+
+      // Verify current password
+      const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+      if (!isCurrentPasswordValid) {
+        return res.status(400).json({ error: 'Current password is incorrect' });
+      }
+
+      // Update password
+      user.password = newPassword;
+    }
+
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        level: user.level,
+        totalPoints: user.totalPoints,
+        currentStreak: user.currentStreak
+      }
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ error: 'Server error during profile update' });
+  }
+});
+
 // Logout
 router.post('/logout', (req, res) => {
   // Clear session
