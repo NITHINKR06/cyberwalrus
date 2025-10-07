@@ -5,7 +5,7 @@ import { submitScamReport, reportService } from '../services/backendApi';
 import MapPicker from './MapPicker';
 
 export default function ReportScam() {
-  const { user } = useAuth(); // Keep for potential future use
+  // const { user } = useAuth(); // Keep for potential future use
   const [formData, setFormData] = useState({
     scamType: '',
     description: '',
@@ -22,7 +22,7 @@ export default function ReportScam() {
     streetName: '',
     colony: '',
     district: '',
-    state: '',
+    state: 'Karnataka',
     country: 'India',
     // Personal details for complaint
     fullName: '',
@@ -97,7 +97,7 @@ export default function ReportScam() {
       setFormData({
         scamType: '', description: '', url: '', phoneNumber: '', email: '', severity: 'medium',
         village: '', tehsil: '', policeStation: '', pincode: '', houseNo: '', streetName: '',
-        colony: '', district: '', state: '', country: 'India', fullName: '', mobile: '',
+        colony: '', district: '', state: 'Karnataka', country: 'India', fullName: '', mobile: '',
         gender: '', dob: '', spouse: '', relationWithVictim: '', emailAddress: '',
       });
     } catch (err) {
