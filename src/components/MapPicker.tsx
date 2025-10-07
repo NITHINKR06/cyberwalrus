@@ -108,18 +108,27 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
       
       if (response.data.length > 0) {
         const place = response.data[0];
-        const address = place.display_name.split(', ');
         
-        // Parse the address components
+        // Get detailed address information using reverse geocoding
+        const reverseResponse = await axios.get(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
+        );
+        
+        const address = reverseResponse.data.address;
+        
+        // Parse the address components properly
         const locationData = {
-          village: address[0] || '',
-          tehsil: address[1] || '',
-          district: address[2] || '',
-          state: address[3] || 'Karnataka',
+          houseNo: address.house_number || '',
+          streetName: address.road || address.pedestrian || '',
+          village: address.village || address.town || address.city || address.suburb || '',
+          tehsil: address.county || address.suburb || '',
+          district: address.state_district || address.city_district || address.county || '',
+          state: address.state || 'Karnataka',
           pincode: pincode,
-          country: 'India',
+          country: address.country || 'India',
         };
         
+        console.log('Pincode search result:', locationData);
         onLocationSelect(locationData);
         onClose();
       } else {

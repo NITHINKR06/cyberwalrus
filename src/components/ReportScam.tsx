@@ -38,6 +38,7 @@ export default function ReportScam() {
   const [showMap, setShowMap] = useState(false); // State to control map visibility
   const [submittedReport, setSubmittedReport] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
 
   const scamTypes = [
     'Phishing Email', 'Fake Website', 'Phone Scam', 'SMS Scam', 'Social Media Scam',
@@ -488,18 +489,75 @@ export default function ReportScam() {
                         {formData.pincode.length === 6 && /^\d{6}$/.test(formData.pincode) && (
                           <button
                             type="button"
-                            onClick={() => {
-                              // Auto-fill location from pincode
-                              setFormData(prev => ({
-                                ...prev,
-                                village: `Area with pincode ${formData.pincode}`,
-                                state: 'Karnataka',
-                                country: 'India',
-                              }));
+                            onClick={async () => {
+                              setIsPincodeLoading(true);
+                              try {
+                                // Search by pincode using Nominatim
+                                const response = await fetch(
+                                  `https://nominatim.openstreetmap.org/search?format=json&postalcode=${formData.pincode}&countrycodes=in&limit=1`
+                                );
+                                const data = await response.json();
+                                
+                                if (data.length > 0) {
+                                  const place = data[0];
+                                  
+                                  // Get detailed address information using reverse geocoding
+                                  const reverseResponse = await fetch(
+                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${place.lat}&lon=${place.lon}`
+                                  );
+                                  const reverseData = await reverseResponse.json();
+                                  
+                                  const address = reverseData.address;
+                                  
+                                  // Update form with detailed address
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    houseNo: address.house_number || '',
+                                    streetName: address.road || address.pedestrian || '',
+                                    village: address.village || address.town || address.city || address.suburb || '',
+                                    tehsil: address.county || address.suburb || '',
+                                    district: address.state_district || address.city_district || address.county || '',
+                                    state: address.state || 'Karnataka',
+                                    country: address.country || 'India',
+                                  }));
+                                  
+                                  // Show success message
+                                  alert(`Location found and filled for pincode ${formData.pincode}!`);
+                                } else {
+                                  // Fallback: use pincode as is
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    village: `Area with pincode ${formData.pincode}`,
+                                    state: 'Karnataka',
+                                    country: 'India',
+                                  }));
+                                  alert(`Pincode ${formData.pincode} not found in database. Using basic location info.`);
+                                }
+                              } catch (error) {
+                                console.error('Pincode search error:', error);
+                                // Fallback: use pincode as is
+                                setFormData(prev => ({
+                                  ...prev,
+                                  village: `Area with pincode ${formData.pincode}`,
+                                  state: 'Karnataka',
+                                  country: 'India',
+                                }));
+                                alert(`Error fetching location for pincode ${formData.pincode}. Using basic location info.`);
+                              } finally {
+                                setIsPincodeLoading(false);
+                              }
                             }}
-                            className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                            className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            disabled={isPincodeLoading}
                           >
-                            Auto-fill
+                            {isPincodeLoading ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                Loading...
+                              </>
+                            ) : (
+                              'Auto-fill'
+                            )}
                           </button>
                         )}
                       </div>
