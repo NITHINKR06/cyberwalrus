@@ -47,6 +47,8 @@ router.post('/analyze', async (req, res) => {
     console.log(`Analyzing ${inputType}: ${inputContent.substring(0, 50)}...`);
     const analysisResult = await aiAnalyzer.analyze(inputType, inputContent);
 
+    console.log('Analysis result:', analysisResult);
+
     // Save to history
     const history = new AnalyzerHistory({
       userId,
@@ -85,7 +87,7 @@ router.post('/analyze', async (req, res) => {
       sessionId: req.session.sessionId
     });
   } catch (error) {
-    console.error('Error analyzing content:', error);
+    console.log('Error analyzing content:', error);
     res.status(500).json({ error: 'Server error while analyzing content' });
   }
 });

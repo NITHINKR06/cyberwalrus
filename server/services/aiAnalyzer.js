@@ -132,8 +132,9 @@ class AIAnalyzerService {
         Keep the response concise and user-friendly.
       `;
 
+      // UPDATED: Changed model from gemini-pro to gemini-2.5-flash for better reliability
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${this.geminiApiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
         {
           contents: [{
             parts: [{
