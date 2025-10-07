@@ -1,0 +1,64 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Globe, Check } from 'lucide-react';
+
+const languages = [
+  { code: 'en', name: 'English', nativeName: 'English' },
+  { code: 'hi', name: 'Hindi', nativeName: 'हिंदी' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' }
+];
+
+export default function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleLanguageChange = (langCode: string) => {
+    i18n.changeLanguage(langCode);
+    setIsOpen(false);
+  };
+
+  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        aria-label="Change language"
+      >
+        <Globe className="w-5 h-5" />
+        <span className="hidden sm:inline text-sm font-medium">{currentLanguage.nativeName}</span>
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+            <div className="py-1">
+              {languages.map((language) => (
+                <button
+                  key={language.code}
+                  onClick={() => handleLanguageChange(language.code)}
+                  className={`w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center justify-between ${
+                    i18n.language === language.code ? 'bg-blue-50' : ''
+                  }`}
+                >
+                  <div>
+                    <div className="font-medium text-gray-900">{language.nativeName}</div>
+                    <div className="text-xs text-gray-500">{language.name}</div>
+                  </div>
+                  {i18n.language === language.code && (
+                    <Check className="w-4 h-4 text-blue-600" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
