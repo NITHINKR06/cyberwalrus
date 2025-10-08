@@ -321,7 +321,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                     <button
                       key={index}
                       onClick={() => setSearchQuery(city)}
-                      className="p-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg text-left transition-colors"
+                      className="p-2 text-sm bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-lg text-left transition-colors"
                     >
                       {city}
                     </button>
@@ -336,7 +336,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                     <button
                       key={index}
                       onClick={() => setSearchQuery(pincode)}
-                      className="p-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg text-center transition-colors font-mono"
+                      className="p-2 text-sm bg-green-100 text-gray-950 hover:bg-green-200 rounded-lg text-center transition-colors font-mono"
                     >
                       {pincode}
                     </button>

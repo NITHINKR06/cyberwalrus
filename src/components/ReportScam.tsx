@@ -588,13 +588,13 @@ export default function ReportScam() {
                             </div>
                           )}
                         </div>
-                        {pincodeSuccess && (
+                        {/* {pincodeSuccess && (
                           <div className="mt-2 p-2 bg-green-100 border border-green-300 rounded-lg">
                             <p className="text-sm text-green-800">
                               ✅ {pincodeSuccess}
                             </p>
                           </div>
-                        )}
+                        )} */}
                       </div>
                     </div>
                     <div>

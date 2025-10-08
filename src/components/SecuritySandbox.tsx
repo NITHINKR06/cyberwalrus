@@ -151,7 +151,7 @@ export default function SecuritySandbox() {
           </h3>
           <div className="bg-red-50 p-4 rounded-lg min-h-[200px]">
             <p className="font-semibold">{t('securitySandbox.aiSummary')}</p>
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{unsecuredResult?.summary || t('securitySandbox.resultsWillAppear')}</p>
+            <p className="text-gray-700 dark:text-gray-800 whitespace-pre-wrap">{unsecuredResult?.summary || t('securitySandbox.resultsWillAppear')}</p>
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function SecuritySandbox() {
           </h3>
           <div className="bg-green-50 p-4 rounded-lg min-h-[200px]">
             <p className="font-semibold">{t('securitySandbox.aiSummary')}</p>
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{securedResult?.summary || t('securitySandbox.resultsWillAppear')}</p>
+            <p className="text-gray-700 dark:text-gray-800 whitespace-pre-wrap">{securedResult?.summary || t('securitySandbox.resultsWillAppear')}</p>
           </div>
         </div>
       </div>

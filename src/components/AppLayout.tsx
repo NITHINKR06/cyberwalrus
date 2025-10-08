@@ -97,30 +97,20 @@ export default function AppLayout() {
 
             {/* Main Navigation - Hidden on mobile */}
             <div className="hidden lg:flex items-center gap-2 flex-1 justify-center">
-              {/* Primary Navigation */}
-              <div className="flex items-center gap-1">
-                <NavDropdown
-                  label={t('nav.dashboard')}
-                  icon={LayoutDashboard}
-                  items={dashboardItems}
-                  isActive={isActiveRoute('/dashboard')}
-                />
-                
-                <button
-                  onClick={() => navigate('/modules')}
-                  className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'}`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  <span>{t('nav.learn')}</span>
-                </button>
-
-                <NavDropdown
-                  label={t('nav.achievements')}
-                  icon={Award}
-                  items={achievementsItems}
-                  isActive={isActiveRoute('/achievements')}
-                />
-              </div>
+              {/* Main Menu Dropdown */}
+              <NavDropdown
+                label={t('nav.menu', 'Menu')}
+                icon={Menu}
+                items={[
+                  { id: 'dashboard', name: t('nav.dashboard'), icon: LayoutDashboard, onClick: () => navigate('/dashboard') },
+                  { id: 'analytics', name: t('nav.analytics', 'Analytics'), icon: BarChart3, onClick: () => navigate('/dashboard') },
+                  { id: 'learn', name: t('nav.learn'), icon: BookOpen, onClick: () => navigate('/modules') },
+                  { id: 'achievements', name: t('nav.achievements'), icon: Award, onClick: () => navigate('/achievements') },
+                  { id: 'leaderboard', name: t('nav.leaderboard'), icon: Trophy, onClick: () => navigate('/achievements') },
+                  { id: 'goals', name: t('nav.goals', 'Goals & Progress'), icon: Target, onClick: () => navigate('/achievements') },
+                ]}
+                isActive={isActiveRoute('/dashboard') || isActiveRoute('/modules') || isActiveRoute('/achievements')}
+              />
               
               {/* Elegant Separator */}
               <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600 mx-3"></div>
