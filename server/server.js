@@ -68,6 +68,7 @@ import analyzerRoutes from './routes/analyzer.js';
 import userRoutes from './routes/user.js';
 import scenarioRoutes from './routes/scenarios.js';
 import ocrRoutes from './routes/ocr.js';
+import configRoutes from './routes/config.js';
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -76,6 +77,7 @@ app.use('/api/analyzer', analyzerRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/scenarios', scenarioRoutes);
 app.use('/api/ocr', ocrRoutes);
+app.use('/api/config', configRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
