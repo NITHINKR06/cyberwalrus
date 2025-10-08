@@ -13,7 +13,18 @@
     "scamAnalyzer": "Scam Analyzer",
     "threatDashboard": "Threat Dashboard",
     "community": "Community",
-    "logout": "Logout"
+    "logout": "Logout",
+    "analytics": "Analytics",
+    "goals": "Goals & Progress",
+    "profile": "Profile",
+    "settings": "Settings",
+    "securitySandbox": "Security Sandbox",
+    "timeMachine": "Time Machine",
+    "quickAnalysis": "Quick Analysis",
+    "notifications": "Notifications",
+    "tools": "Tools",
+    "quickActions": "Quick Actions",
+    "account": "Account"
   },
   "auth": {
     "signIn": "Sign In",

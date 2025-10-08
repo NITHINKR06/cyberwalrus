@@ -43,26 +43,26 @@ export default function AppLayout() {
 
   // Navigation structure with dropdowns
   const dashboardItems = [
-    { id: 'dashboard', name: 'Overview', icon: LayoutDashboard, onClick: () => navigate('/dashboard') },
-    { id: 'analytics', name: 'Analytics', icon: BarChart3, onClick: () => navigate('/dashboard') },
+    { id: 'dashboard', name: t('nav.dashboard'), icon: LayoutDashboard, onClick: () => navigate('/dashboard') },
+    { id: 'analytics', name: t('nav.analytics', 'Analytics'), icon: BarChart3, onClick: () => navigate('/dashboard') },
   ];
 
   const achievementsItems = [
-    { id: 'achievements', name: 'My Achievements', icon: Award, onClick: () => navigate('/achievements') },
-    { id: 'leaderboard', name: 'Leaderboard', icon: Trophy, onClick: () => navigate('/achievements') },
-    { id: 'goals', name: 'Goals & Progress', icon: Target, onClick: () => navigate('/achievements') },
+    { id: 'achievements', name: t('nav.achievements'), icon: Award, onClick: () => navigate('/achievements') },
+    { id: 'leaderboard', name: t('nav.leaderboard'), icon: Trophy, onClick: () => navigate('/achievements') },
+    { id: 'goals', name: t('nav.goals', 'Goals & Progress'), icon: Target, onClick: () => navigate('/achievements') },
   ];
 
   const userMenuItems = [
-    { id: 'profile', name: 'Profile', icon: User, onClick: () => navigate('/profile') },
-    { id: 'settings', name: 'Settings', icon: Settings, onClick: () => navigate('/settings') },
-    { id: 'logout', name: 'Logout', icon: LogOut, onClick: logout },
+    { id: 'profile', name: t('nav.profile', 'Profile'), icon: User, onClick: () => navigate('/profile') },
+    { id: 'settings', name: t('nav.settings', 'Settings'), icon: Settings, onClick: () => navigate('/settings') },
+    { id: 'logout', name: t('nav.logout'), icon: LogOut, onClick: logout },
   ];
 
   const toolsNavigation = [
     { id: 'analyzer', name: t('nav.scamAnalyzer'), icon: Search, path: '/analyzer' },
-    { id: 'sandbox', name: 'Security Sandbox', icon: FlaskConical, path: '/sandbox' },
-    { id: 'timemachine', name: 'Time Machine', icon: Clock, path: '/timemachine' },
+    { id: 'sandbox', name: t('nav.securitySandbox', 'Security Sandbox'), icon: FlaskConical, path: '/sandbox' },
+    { id: 'timemachine', name: t('nav.timeMachine', 'Time Machine'), icon: Clock, path: '/timemachine' },
     { id: 'report', name: t('nav.reportScam'), icon: AlertTriangle, path: '/report' },
   ] as const;
 
@@ -95,10 +95,10 @@ export default function AppLayout() {
             </div>
 
             {/* Main Navigation - Hidden on mobile */}
-            <div className="hidden lg:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-2">
               {/* Dashboard Dropdown */}
               <NavDropdown
-                label="Dashboard"
+                label={t('nav.dashboard')}
                 icon={LayoutDashboard}
                 items={dashboardItems}
                 isActive={isActiveRoute('/dashboard')}
@@ -107,35 +107,35 @@ export default function AppLayout() {
               {/* Learning Modules */}
               <button
                 onClick={() => navigate('/modules')}
-                className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'} min-w-0 hover:scale-105 transition-all duration-200`}
+                className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'} hover:scale-105 transition-all duration-200`}
               >
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden xl:inline">{t('nav.learn')}</span>
+                <BookOpen className="w-5 h-5" />
+                <span>{t('nav.learn')}</span>
               </button>
 
               {/* Achievements Dropdown */}
               <NavDropdown
-                label="Achievements"
+                label={t('nav.achievements')}
                 icon={Award}
                 items={achievementsItems}
                 isActive={isActiveRoute('/achievements')}
               />
               
               {/* Separator */}
-              <div className="w-px h-8 bg-gray-300 dark:bg-gray-600 mx-2"></div>
+              <div className="w-px h-8 bg-gray-300 dark:bg-gray-600 mx-3"></div>
               
               {/* Tools Navigation Group */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {toolsNavigation.map((item) => {
                   const Icon = item.icon;
                   return (
                     <button
                       key={item.id}
                       onClick={() => navigate(item.path)}
-                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'} min-w-0 hover:scale-105 transition-all duration-200 group`}
+                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'} hover:scale-105 transition-all duration-200 group`}
                     >
-                      <Icon className="w-4 h-4 group-hover:rotate-12 transition-transform duration-200" />
-                      <span className="hidden xl:inline">{item.name}</span>
+                      <Icon className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
+                      <span>{item.name}</span>
                     </button>
                   );
                 })}
@@ -143,37 +143,38 @@ export default function AppLayout() {
             </div>
 
             {/* Right Section - User Info & Controls */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* Quick Search */}
               <div className="hidden lg:block">
                 <button
                   onClick={() => navigate('/analyzer')}
-                  className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-110 transition-all duration-200 group"
-                  title="Quick Analysis"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
+                  title={t('nav.quickAnalysis', 'Quick Analysis')}
                 >
                   <Search className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                  <span className="hidden xl:inline text-sm font-medium">Quick Search</span>
                 </button>
               </div>
 
               {/* Utility Controls */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <LanguageSwitcher />
                 
                 {/* Notifications */}
                 <button
-                  className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-110 transition-all duration-200 group relative"
-                  title="Notifications"
+                  className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group relative"
+                  title={t('nav.notifications', 'Notifications')}
                 >
-                  <Bell className="w-4 h-4 group-hover:animate-pulse" />
+                  <Bell className="w-5 h-5 group-hover:animate-pulse" />
                   <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
                 </button>
                 
                 <button
                   onClick={toggleTheme}
                   aria-label="Toggle theme"
-                  className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-110 transition-all duration-200 group"
+                  className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
                 >
-                  <span className="group-hover:rotate-180 transition-transform duration-300">
+                  <span className="group-hover:rotate-180 transition-transform duration-300 text-lg">
                     {isDark ? '🌙' : '🌞'}
                   </span>
                 </button>
@@ -184,14 +185,14 @@ export default function AppLayout() {
                     label={user.username}
                     icon={User}
                     items={userMenuItems}
-                    className="min-w-0 hover:scale-105 transition-transform duration-200"
+                    className="hover:scale-105 transition-transform duration-200"
                   />
                 </div>
 
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden p-2 rounded-xl text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-110 transition-all duration-200 group"
+                  className="md:hidden p-2.5 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
                 >
                   <span className="group-hover:rotate-90 transition-transform duration-200">
                     {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -208,7 +209,7 @@ export default function AppLayout() {
               {/* Dashboard Section */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">
-                  Dashboard
+                  {t('nav.dashboard')}
                 </p>
                 <div className="space-y-1">
                   {dashboardItems.map((item) => {
@@ -251,7 +252,7 @@ export default function AppLayout() {
               {/* Achievements Section */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">
-                  Achievements
+                  {t('nav.achievements')}
                 </p>
                 <div className="space-y-1">
                   {achievementsItems.map((item) => {
@@ -278,7 +279,7 @@ export default function AppLayout() {
               {/* Tools Navigation */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">
-                  Tools
+                  {t('nav.tools', 'Tools')}
                 </p>
                 <div className="space-y-1">
                   {toolsNavigation.map((item) => {
@@ -305,7 +306,7 @@ export default function AppLayout() {
               {/* Quick Actions */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">
-                  Quick Actions
+                  {t('nav.quickActions', 'Quick Actions')}
                 </p>
                 <div className="space-y-1">
                   <button
@@ -316,7 +317,7 @@ export default function AppLayout() {
                     className="w-full flex items-center gap-3 rounded-xl font-medium btn-nav px-3 py-2 hover:scale-105 transition-all"
                   >
                     <Search className="w-5 h-5" />
-                    <span>Quick Analysis</span>
+                    <span>{t('nav.quickAnalysis', 'Quick Analysis')}</span>
                   </button>
                   <button
                     onClick={() => {
@@ -326,7 +327,7 @@ export default function AppLayout() {
                     className="w-full flex items-center gap-3 rounded-xl font-medium btn-nav px-3 py-2 hover:scale-105 transition-all"
                   >
                     <AlertTriangle className="w-5 h-5" />
-                    <span>Report Scam</span>
+                    <span>{t('nav.reportScam')}</span>
                   </button>
                 </div>
               </div>
@@ -334,7 +335,7 @@ export default function AppLayout() {
               {/* User Menu */}
               <div className="pt-2 border-t border-glass">
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">
-                  Account
+                  {t('nav.account', 'Account')}
                 </p>
                 <div className="space-y-1">
                   {userMenuItems.map((item) => {

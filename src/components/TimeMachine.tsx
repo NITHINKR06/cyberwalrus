@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { timeMachineService } from '../services/backendApi';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
@@ -12,6 +13,7 @@ interface Scenario {
 }
 
 export default function TimeMachine() {
+  const { t } = useTranslation();
   const [era, setEra] = useState<number | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,17 +35,17 @@ export default function TimeMachine() {
   };
 
   const eras = [
-    { year: 2015, name: 'Classic Scams' },
-    { year: 2025, name: 'Modern Threats' },
-    { year: 2035, name: 'Future Frauds' },
+    { year: 2015, name: t('timeMachine.classicScams') },
+    { year: 2025, name: t('timeMachine.modernThreats') },
+    { year: 2035, name: t('timeMachine.futureFrauds') },
   ];
 
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">Scam Time Machine</h1>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('timeMachine.title')}</h1>
         <p className="text-lg text-gray-600">
-          Explore interactive challenges from different eras of cyber threats.
+          {t('timeMachine.subtitle')}
         </p>
       </div>
 
@@ -64,7 +66,7 @@ export default function TimeMachine() {
       </div>
 
       <div>
-        {isLoading && <p className="text-center">Loading scenarios...</p>}
+        {isLoading && <p className="text-center">{t('timeMachine.loadingScenarios')}</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
         
         <div className="space-y-6">
@@ -77,20 +79,20 @@ export default function TimeMachine() {
                     <h3 className="text-2xl font-bold text-gray-900 mt-1">{scenario.name}</h3>
                   </div>
                   <div className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                    {era === 2015 ? 'Classic' : era === 2025 ? 'Modern' : 'Future'}
+                    {era === 2015 ? t('timeMachine.classic') : era === 2025 ? t('timeMachine.modern') : t('timeMachine.future')}
                   </div>
                 </div>
                 <p className="mt-3 text-gray-600">{scenario.description}</p>
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-red-600 flex items-center gap-2 mb-2"><AlertTriangle size={18} /> Red Flags</h4>
+                    <h4 className="font-semibold text-red-600 flex items-center gap-2 mb-2"><AlertTriangle size={18} /> {t('timeMachine.redFlags')}</h4>
                     <ul className="list-disc list-inside space-y-1 text-gray-700">
                       {scenario.red_flags.map((flag, i) => <li key={i}>{flag}</li>)}
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-green-600 flex items-center gap-2 mb-2"><ShieldCheck size={18} /> Impact & Prevention</h4>
+                    <h4 className="font-semibold text-green-600 flex items-center gap-2 mb-2"><ShieldCheck size={18} /> {t('timeMachine.impactPrevention')}</h4>
                     <p className="text-gray-700">{scenario.impact.summary}</p>
                   </div>
                 </div>

@@ -37,11 +37,11 @@ export default function NavDropdown({ label, icon: Icon, items, isActive = false
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`${isActive ? 'btn-nav-active' : 'btn-nav'} ${className} min-w-0`}
+        className={`${isActive ? 'btn-nav-active' : 'btn-nav'} ${className}`}
       >
-        <Icon className="w-4 h-4" />
-        <span className="hidden xl:inline">{label}</span>
-        {isOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        <Icon className="w-5 h-5" />
+        <span>{label}</span>
+        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
       {isOpen && (

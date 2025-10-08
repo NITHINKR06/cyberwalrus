@@ -131,26 +131,28 @@
   }
   /* Clean navbar buttons without glow */
   .btn-nav {
-    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium border transition-all duration-200;
-    background-color: rgba(0,0,0,0.08);
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium border transition-all duration-200;
+    background-color: rgba(0,0,0,0.06);
     color: #0f172a; /* slate-900 for better contrast */
-    border-color: rgba(0,0,0,0.15);
+    border-color: rgba(0,0,0,0.12);
+    min-width: auto;
   }
   .btn-nav:hover {
-    background-color: rgba(0,0,0,0.12);
+    background-color: rgba(0,0,0,0.1);
     transform: translateY(-1px);
-    border-color: rgba(0,0,0,0.2);
+    border-color: rgba(0,0,0,0.18);
   }
   .dark .btn-nav {
-    background-color: rgba(255,255,255,0.03);
-    color: #d1d5db; /* gray-300 for better contrast */
-    border-color: rgba(255,255,255,0.08);
+    background-color: rgba(255,255,255,0.04);
+    color: #e2e8f0; /* slate-200 for better contrast */
+    border-color: rgba(255,255,255,0.1);
   }
   .dark .btn-nav:hover {
     background-color: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
   }
   .btn-nav-active {
-    @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-semibold text-white transition-all duration-200;
+    @apply inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold text-white transition-all duration-200;
     background-image: linear-gradient(
       90deg,
       rgb(var(--primary-start)) 0%,
@@ -158,6 +160,7 @@
       rgb(var(--primary-end)) 100%
     );
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
   }
   .btn-nav-active:hover {
     transform: translateY(-1px);

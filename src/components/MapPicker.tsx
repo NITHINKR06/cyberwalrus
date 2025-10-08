@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin, Search, Hash } from 'lucide-react';
 import axios from 'axios';
 
@@ -8,6 +9,7 @@ interface MapPickerProps {
 }
 
 export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -232,7 +234,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Select Location</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('mapPicker.title')}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
         </div>
           
@@ -249,8 +251,8 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  placeholder="Enter pincode (574110) or search location (Bangalore, Karnataka)"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={t('mapPicker.placeholder')}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <button
@@ -261,12 +263,12 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                 {isSearching ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Searching...
+                    {t('mapPicker.searching')}
                   </>
                 ) : (
                   <>
                     <Search className="w-4 h-4" />
-                    Search
+                    {t('mapPicker.search')}
                   </>
                 )}
               </button>
@@ -276,14 +278,14 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
             {isPincodeSearching && (
               <div className="mt-2 flex items-center gap-2 text-green-600">
                 <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm">Auto-fetching location for pincode {searchQuery}...</span>
+                <span className="text-sm">{t('mapPicker.autoFetching', { pincode: searchQuery })}</span>
               </div>
             )}
             
             {/^\d{6}$/.test(searchQuery.trim()) && !isPincodeSearching && (
               <div className="mt-2 flex items-center gap-2 text-green-600">
                 <Hash className="w-4 h-4" />
-                <span className="text-sm">Pincode detected! Auto-fetching location data...</span>
+                <span className="text-sm">{t('mapPicker.pincodeDetected')}</span>
               </div>
             )}
             
@@ -302,7 +304,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                   className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <MapPin className="w-4 h-4" />
-                  Use "{searchQuery}" as location
+                  {t('mapPicker.useAsLocation', { query: searchQuery })}
                 </button>
               </div>
             )}
@@ -310,10 +312,10 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
 
           {searchResults.length === 0 && !searchQuery && (
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-800 mb-3">Quick Options:</h3>
+              <h3 className="font-semibold text-gray-800 mb-3">{t('mapPicker.quickOptions')}</h3>
               
               <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Popular Karnataka Cities:</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">{t('mapPicker.popularCities')}</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {popularKarnatakaCities.map((city, index) => (
                     <button
@@ -328,7 +330,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
               </div>
               
               <div>
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Try Pincode Search:</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">{t('mapPicker.tryPincodeSearch')}</h4>
                 <div className="grid grid-cols-3 gap-2">
                   {['574110', '560001', '570001', '580001', '590001', '591101'].map((pincode, index) => (
                     <button
@@ -346,7 +348,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
 
           {searchResults.length > 0 && (
             <div className="space-y-2">
-              <h3 className="font-semibold text-gray-800 mb-3">Search Results:</h3>
+              <h3 className="font-semibold text-gray-800 mb-3">{t('mapPicker.searchResults')}</h3>
               {searchResults.map((place, index) => (
                 <div
                   key={index}
@@ -358,7 +360,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                     <div>
                       <p className="font-medium text-gray-800">{place.display_name}</p>
                       <p className="text-sm text-gray-600 mt-1">
-                        Type: {place.type} | Importance: {place.importance?.toFixed(2)}
+                        {t('mapPicker.type')}: {place.type} | {t('mapPicker.importance')}: {place.importance?.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -370,7 +372,7 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
           {searchResults.length === 0 && searchQuery && !isSearching && (
             <div className="text-center py-8">
               <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600 mb-4">No locations found. Try a different search term.</p>
+              <p className="text-gray-600 mb-4">{t('mapPicker.noLocationsFound')}</p>
               <button
                 onClick={() => {
                   // Manual location entry
@@ -383,20 +385,20 @@ export default function MapPicker({ onLocationSelect, onClose }: MapPickerProps)
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Use "{searchQuery}" as location
+                {t('mapPicker.useAsLocation', { query: searchQuery })}
               </button>
             </div>
           )}
 
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-800 mb-2">Search Tips:</h4>
+            <h4 className="font-semibold text-blue-800 mb-2">{t('mapPicker.searchTips')}</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• <strong>Enter 6-digit pincode</strong> (e.g., 574110) for auto-fetch from postal database</li>
-              <li>• <strong>Search post office names</strong> (e.g., "New Delhi GPO", "Bangalore GPO")</li>
-              <li>• Focus on Karnataka locations for best results</li>
-              <li>• Include city and state for better results</li>
-              <li>• Try different spellings if no results found</li>
-              <li>• Examples: "574110", "New Delhi GPO", "Bangalore, Karnataka", "Mysore, Karnataka"</li>
+              <li>• <strong>{t('mapPicker.enterPincode')}</strong></li>
+              <li>• <strong>{t('mapPicker.searchPostOffice')}</strong></li>
+              <li>• {t('mapPicker.focusKarnataka')}</li>
+              <li>• {t('mapPicker.includeCityState')}</li>
+              <li>• {t('mapPicker.tryDifferentSpellings')}</li>
+              <li>• {t('mapPicker.examples')}</li>
             </ul>
           </div>
         </div>
