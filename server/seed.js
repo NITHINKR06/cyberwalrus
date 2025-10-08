@@ -174,7 +174,8 @@ async function seedDatabase() {
   try {
     // Connect to MongoDB
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/walrus_db';
-    await mongoose.connect(mongoUri);
+    const mongoDbName = process.env.MONGODB_DBNAME; // optional override
+    await mongoose.connect(mongoUri, mongoDbName ? { dbName: mongoDbName } : undefined);
     console.log('Connected to MongoDB successfully');
 
     // --- Seed Users ---

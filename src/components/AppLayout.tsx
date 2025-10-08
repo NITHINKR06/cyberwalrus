@@ -23,7 +23,8 @@ import {
   Settings,
   BarChart3,
   Trophy,
-  Target
+  Target,
+  Clock
 } from 'lucide-react';
 
 export default function AppLayout() {
@@ -59,6 +60,7 @@ export default function AppLayout() {
   const toolsNavigation = [
     { id: 'analyzer', name: t('nav.scamAnalyzer'), icon: Search, path: '/analyzer' },
     { id: 'sandbox', name: 'Security Sandbox', icon: FlaskConical, path: '/sandbox' },
+    { id: 'timemachine', name: 'Time Machine', icon: Clock, path: '/timemachine' },
     { id: 'report', name: t('nav.reportScam'), icon: AlertTriangle, path: '/report' },
   ] as const;
 
