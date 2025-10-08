@@ -1,4 +1,4 @@
- import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Shield, 
@@ -15,6 +15,30 @@ import {
 } from 'lucide-react';
 import { analyzeContent, ocrService } from '../services/backendApi';
 import { toast } from 'react-toastify';
+import axios from 'axios';
+
+interface ThreatLevelConfig {
+  name: string;
+  displayName: string;
+  color: string;
+  icon: string;
+  toastType: string;
+  toastMessage: string;
+  cssClasses: {
+    container: string;
+    icon: string;
+    progressBar: string;
+  };
+}
+
+interface ValidationRules {
+  threatLevels: {
+    [key: string]: ThreatLevelConfig;
+  };
+  recommendations: {
+    [key: string]: string[];
+  };
+}
 
 interface AnalysisResult {
   threatLevel: 'safe' | 'suspicious' | 'dangerous';
@@ -24,9 +48,10 @@ interface AnalysisResult {
   summary?: string;
   ocrConfidence?: number;
   extractedText?: string;
+  threatConfig?: ThreatLevelConfig;
 }
 
-export default function ScamAnalyzer() {
+export default function ScamAnalyzerConfigurable() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'text' | 'url' | 'image'>('text');
   const [textInput, setTextInput] = useState<string>('');
@@ -34,11 +59,29 @@ export default function ScamAnalyzer() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [validationRules, setValidationRules] = useState<ValidationRules | null>(null);
 
   // For image upload
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch validation rules on component mount
+  useEffect(() => {
+    fetchValidationRules();
+  }, []);
+
+  const fetchValidationRules = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/config/validation-rules');
+      if (response.data.success) {
+        setValidationRules(response.data.rules);
+      }
+    } catch (err) {
+      console.error('Failed to fetch validation rules:', err);
+      // Use default rules if fetch fails
+    }
+  };
 
   const validateText = (text: string): { warnings: string[]; threatLevel?: 'high' | 'medium' | 'low' } => {
     const warnings: string[] = [];
@@ -59,7 +102,8 @@ export default function ScamAnalyzer() {
       { pattern: /(loan|credit).{0,20}(approved|offer|guaranteed)/i, message: 'SCAM ALERT: Unsolicited loan offer', threat: 'high' },
       { pattern: /pre.?approved.{0,20}(loan|credit|amount)/i, message: 'SCAM ALERT: Pre-approved loan scam', threat: 'high' },
       { pattern: /transfer.{0,20}(money|funds|amount)/i, message: 'WARNING: Money transfer request', threat: 'medium' },
-      { pattern: /claim.{0,20}(reward|prize|money|refund)/i, message: 'SCAM ALERT: Prize/reward claim', threat: 'high' }
+      { pattern: /claim.{0,20}(reward|prize|money|refund)/i, message: 'SCAM ALERT: Prize/reward claim', threat: 'high' },
+      { pattern: /click.{0,20}(here|link|below).{0,20}(claim|verify|update)/i, message: 'SCAM ALERT: Suspicious click request', threat: 'high' }
     ];
 
     // HIGH RISK: Malware/hacking threats
@@ -67,7 +111,8 @@ export default function ScamAnalyzer() {
       { pattern: /virus|malware|trojan|ransomware/i, message: 'Contains malware-related terms', threat: 'high' },
       { pattern: /hack(ed|er|ing)?|compromised|breach/i, message: 'Contains hacking-related threats', threat: 'high' },
       { pattern: /phish(y|ing|er)?|spoof(ed|ing)?/i, message: 'Contains phishing indicators', threat: 'high' },
-      { pattern: /infected|detected.{0,20}threat|security.{0,20}(risk|threat)/i, message: 'Fake security threat warning', threat: 'high' }
+      { pattern: /infected|detected.{0,20}threat|security.{0,20}(risk|threat)/i, message: 'Fake security threat warning', threat: 'high' },
+      { pattern: /download.{0,20}(software|app|tool).{0,20}(remove|clean|fix)/i, message: 'Suspicious download request', threat: 'high' }
     ];
 
     // Check all patterns
@@ -99,42 +144,15 @@ export default function ScamAnalyzer() {
         return { isValid: false, error: 'URL must start with http://, https://, or ftp://' };
       }
 
-      // HIGH RISK: Banking/financial scam patterns in URL
-      const bankingUrlPatterns = [
-        { pattern: /bank.*security.*update/i, message: 'SCAM URL: Fake bank security update', threat: 'high' },
-        { pattern: /account.*verif/i, message: 'SCAM URL: Fake account verification', threat: 'high' },
-        { pattern: /(otp|verification).*code/i, message: 'SCAM URL: OTP/verification phishing', threat: 'high' },
-        { pattern: /loan.*approv/i, message: 'SCAM URL: Fake loan approval', threat: 'high' },
-        { pattern: /urgent.*action/i, message: 'SCAM URL: Urgent action required scam', threat: 'high' },
-        { pattern: /suspended.*account/i, message: 'SCAM URL: Account suspension scam', threat: 'high' }
-      ];
-
-      // HIGH RISK: Malware/virus patterns in URL
-      const malwareUrlPatterns = [
-        { pattern: /virus|malware|trojan|ransomware/i, message: 'DANGER: URL contains malware terms', threat: 'high' },
-        { pattern: /hack(ed|er|ing)?/i, message: 'DANGER: URL contains hacking terms', threat: 'high' },
-        { pattern: /phish(y|ing)?/i, message: 'DANGER: URL contains phishing terms', threat: 'high' },
-        { pattern: /infected|threat.*detected/i, message: 'SCAM URL: Fake threat detection', threat: 'high' }
-      ];
-
-      // Check banking and malware patterns first
-      for (const patterns of [bankingUrlPatterns, malwareUrlPatterns]) {
-        for (const { pattern, message, threat } of patterns) {
-          if (pattern.test(fullUrl)) {
-            return { isValid: true, error: message, threatLevel: threat as 'high' | 'medium' };
-          }
-        }
-      }
-
       // HIGH RISK: Known phishing patterns
       const phishingPatterns = [
         // Typosquatting popular services (like paypa1.com instead of paypal.com)
-        { pattern: /paypa[1l]\./, message: 'HIGH RISK: Looks like PayPal typosquatting', threat: 'high' },
-        { pattern: /pay-?pal[^.]/, message: 'HIGH RISK: PayPal-like domain', threat: 'high' },
-        { pattern: /amaz[0o]n\./, message: 'HIGH RISK: Looks like Amazon typosquatting', threat: 'high' },
-        { pattern: /g[0o]{2}gle\./, message: 'HIGH RISK: Looks like Google typosquatting', threat: 'high' },
-        { pattern: /micr[0o]s[0o]ft\./, message: 'HIGH RISK: Looks like Microsoft typosquatting', threat: 'high' },
-        { pattern: /app[1l]e\./, message: 'HIGH RISK: Looks like Apple typosquatting', threat: 'high' },
+        { pattern: /paypa[1l]\./, message: 'Suspicious: Looks like PayPal typosquatting', threat: 'high' },
+        { pattern: /pay-?pal[^.]/, message: 'Suspicious: PayPal-like domain', threat: 'high' },
+        { pattern: /amaz[0o]n\./, message: 'Suspicious: Looks like Amazon typosquatting', threat: 'high' },
+        { pattern: /g[0o]{2}gle\./, message: 'Suspicious: Looks like Google typosquatting', threat: 'high' },
+        { pattern: /micr[0o]s[0o]ft\./, message: 'Suspicious: Looks like Microsoft typosquatting', threat: 'high' },
+        { pattern: /app[1l]e\./, message: 'Suspicious: Looks like Apple typosquatting', threat: 'high' },
         
         // Subdomain abuse (like yourbank.com.security-update.info)
         { pattern: /\.(com|org|net|edu|gov)\.[^\/]+\.(info|tk|ml|ga|cf)/, message: 'HIGH RISK: Deceptive subdomain mimicking legitimate site', threat: 'high' },
@@ -147,7 +165,8 @@ export default function ScamAnalyzer() {
         { pattern: /verify[- ]?account/, message: 'HIGH RISK: Fake verification page', threat: 'high' },
         
         // Known test malware URLs
-        { pattern: /testsafebrowsing\.appspot\.com/, message: 'TEST MALWARE URL: This is a known test URL for malware', threat: 'high' }
+        { pattern: /testsafebrowsing\.appspot\.com/, message: 'TEST MALWARE URL: This is a known test URL for malware', threat: 'high' },
+        { pattern: /malware|phishing|virus|trojan/i, message: 'WARNING: URL contains malware-related terms', threat: 'medium' }
       ];
 
       // Check for phishing patterns
@@ -180,7 +199,7 @@ export default function ScamAnalyzer() {
       const urlShorteners = [
         'bit.ly', 'tinyurl.com', 'goo.gl', 'ow.ly', 'is.gd', 't.co', 
         'buff.ly', 'short.link', 'tiny.cc', 'soo.gd', 'clck.ru',
-        'cutt.ly', 'shorturl.at', 'rb.gy', 'rotf.lol', 'short.link'
+        'cutt.ly', 'shorturl.at', 'rb.gy', 'rotf.lol'
       ];
       
       if (urlShorteners.some(shortener => hostname.includes(shortener))) {
@@ -208,10 +227,7 @@ export default function ScamAnalyzer() {
         { original: 'microsoft', variants: ['micr0soft', 'microsoſt', 'miсrosoft'] },
         { original: 'apple', variants: ['app1e', 'appIe', 'аpple'] },
         { original: 'facebook', variants: ['faceb00k', 'facebοοk', 'fаcebook'] },
-        { original: 'netflix', variants: ['netf1ix', 'netfIix', 'netfliх'] },
-        { original: 'ebay', variants: ['ebαy', 'еbay'] },
-        { original: 'twitter', variants: ['tw1tter', 'twittеr'] },
-        { original: 'instagram', variants: ['instagгam', 'lnstagram'] }
+        { original: 'netflix', variants: ['netf1ix', 'netfIix', 'netfliх'] }
       ];
 
       for (const { original, variants } of lookAlikePatterns) {
@@ -224,10 +240,10 @@ export default function ScamAnalyzer() {
       const subdomains = hostname.split('.');
       if (subdomains.length > 4) {
         return { isValid: true, error: 'WARNING: Excessive subdomains - often used to deceive', threatLevel: 'medium' };
-      } 
+      }
 
       // Check for suspicious TLDs
-      const suspiciousTlds = ['.tk', '.ml', '.ga', '.cf', '.click', '.download', '.review', '.work', '.top', '.buzz'];
+      const suspiciousTlds = ['.tk', '.ml', '.ga', '.cf', '.click', '.download', '.review', '.work', '.top'];
       if (suspiciousTlds.some(tld => hostname.endsWith(tld))) {
         return { isValid: true, error: 'WARNING: Suspicious top-level domain - often used in scams', threatLevel: 'medium' };
       }
@@ -237,16 +253,15 @@ export default function ScamAnalyzer() {
         { pattern: /@/, message: 'WARNING: @ symbol in URL - can be used to hide real destination', threat: 'high' },
         { pattern: /[<>"]/, message: 'Invalid characters in URL', threat: 'medium' },
         { pattern: /javascript:/i, message: 'BLOCKED: JavaScript URLs are not allowed', threat: 'high' },
-        { pattern: /data:/i, message: 'BLOCKED: Data URLs are not allowed', threat: 'high' },
-        { pattern: /vbscript:/i, message: 'BLOCKED: VBScript URLs are not allowed', threat: 'high' }
+        { pattern: /data:/i, message: 'BLOCKED: Data URLs are not allowed', threat: 'high' }
       ];
 
       for (const { pattern, message, threat } of pathPatterns) {
         if (pattern.test(fullUrl)) {
-          if (threat === 'high' && message.startsWith('BLOCKED')) {
+          if (threat === 'high') {
             return { isValid: false, error: message };
           }
-          return { isValid: true, error: message, threatLevel: threat as 'high' | 'medium' };
+          return { isValid: true, error: message, threatLevel: threat as 'medium' };
         }
       }
 
@@ -324,12 +339,26 @@ export default function ScamAnalyzer() {
       const analysisResult = response.analysisResult;
       setResult(analysisResult);
 
-      if (analysisResult.threatLevel === 'dangerous') {
-        toast.error('⚠️ High threat detected! Please be extremely cautious.');
-      } else if (analysisResult.threatLevel === 'suspicious') {
-        toast.warning('⚠️ Suspicious content detected. Proceed with caution.');
+      // Use configurable toast messages if available
+      if (validationRules && analysisResult.threatConfig) {
+        const config = analysisResult.threatConfig;
+        
+        if (config.toastType === 'error') {
+          toast.error(config.toastMessage);
+        } else if (config.toastType === 'warning') {
+          toast.warning(config.toastMessage);
+        } else {
+          toast.success(config.toastMessage);
+        }
       } else {
-        toast.success('✅ Content appears safe, but always stay vigilant!');
+        // Fallback to default messages
+        if (analysisResult.threatLevel === 'dangerous') {
+          toast.error('⚠️ High threat detected! Please be extremely cautious.');
+        } else if (analysisResult.threatLevel === 'suspicious') {
+          toast.warning('⚠️ Suspicious content detected. Proceed with caution.');
+        } else {
+          toast.success('✅ Content appears safe, but always stay vigilant!');
+        }
       }
     } catch (err) {
       console.error(`Error analyzing ${type}:`, err);
@@ -384,13 +413,26 @@ export default function ScamAnalyzer() {
       
       setResult(analysisResult);
       
-      // Show appropriate toast based on threat level
-      if (analysisResult.threatLevel === 'dangerous') {
-        toast.error('⚠️ High threat detected! Please be extremely cautious.');
-      } else if (analysisResult.threatLevel === 'suspicious') {
-        toast.warning('⚠️ Suspicious content detected. Please review the analysis.');
+      // Use configurable toast messages
+      if (validationRules && analysisResult.threatConfig) {
+        const config = analysisResult.threatConfig;
+        
+        if (config.toastType === 'error') {
+          toast.error(config.toastMessage);
+        } else if (config.toastType === 'warning') {
+          toast.warning(config.toastMessage);
+        } else {
+          toast.success(config.toastMessage);
+        }
       } else {
-        toast.success('✅ Content appears safe based on analysis.');
+        // Fallback messages
+        if (analysisResult.threatLevel === 'dangerous') {
+          toast.error('⚠️ High threat detected! Please be extremely cautious.');
+        } else if (analysisResult.threatLevel === 'suspicious') {
+          toast.warning('⚠️ Suspicious content detected. Please review the analysis.');
+        } else {
+          toast.success('✅ Content appears safe based on analysis.');
+        }
       }
 
     } catch (err) {
@@ -402,8 +444,11 @@ export default function ScamAnalyzer() {
     }
   };
 
-
-  const getThreatLevelColor = (level: string) => {
+  const getThreatLevelColor = (level: string, config?: ThreatLevelConfig) => {
+    if (config && config.cssClasses) {
+      return config.cssClasses.container;
+    }
+    // Fallback to default colors
     switch (level) {
       case 'safe': return 'text-green-600 bg-green-50 border-green-200';
       case 'suspicious': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
@@ -412,62 +457,160 @@ export default function ScamAnalyzer() {
     }
   };
 
-  const getThreatLevelIcon = (level: string) => {
+  const getThreatLevelIcon = (level: string, config?: ThreatLevelConfig) => {
+    const iconName = config?.icon || 'Shield';
+    const iconClass = config?.cssClasses?.icon || 'text-gray-600';
+    
+    // Map icon names to components
+    const iconMap: { [key: string]: JSX.Element } = {
+      'CheckCircle': <CheckCircle className={`w-8 h-8 ${iconClass}`} />,
+      'AlertCircle': <AlertCircle className={`w-8 h-8 ${iconClass}`} />,
+      'XCircle': <XCircle className={`w-8 h-8 ${iconClass}`} />,
+      'Shield': <Shield className={`w-8 h-8 ${iconClass}`} />
+    };
+    
+    return iconMap[iconName] || <Shield className={`w-8 h-8 ${iconClass}`} />;
+  };
+
+  const getProgressBarColor = (level: string, config?: ThreatLevelConfig) => {
+    if (config && config.cssClasses) {
+      return config.cssClasses.progressBar;
+    }
+    // Fallback to default colors
     switch (level) {
-      case 'safe': return <CheckCircle className="w-8 h-8 text-green-600" />;
-      case 'suspicious': return <AlertCircle className="w-8 h-8 text-yellow-600" />;
-      case 'dangerous': return <XCircle className="w-8 h-8 text-red-600" />;
-      default: return <Shield className="w-8 h-8 text-gray-600" />;
+      case 'safe': return 'bg-green-500';
+      case 'suspicious': return 'bg-yellow-500';
+      case 'dangerous': return 'bg-red-500';
+      default: return 'bg-gray-500';
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('scamAnalyzer.title')}</h1>
-        <p className="text-gray-600 dark:text-gray-400">{t('scamAnalyzer.subtitle')}</p>
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+          {t('scamAnalyzer.title')}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          {t('scamAnalyzer.subtitle')}
+        </p>
+        {validationRules && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            Using configurable validation rules
+          </p>
+        )}
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
         <div className="flex gap-4 mb-6">
-          <button onClick={() => setActiveTab('text')} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${activeTab === 'text' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+          <button 
+            onClick={() => setActiveTab('text')} 
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
+              activeTab === 'text' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
             <MessageSquare className="w-5 h-5" /> {t('scamAnalyzer.analyzeText')}
           </button>
-          <button onClick={() => setActiveTab('url')} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${activeTab === 'url' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+          <button 
+            onClick={() => setActiveTab('url')} 
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
+              activeTab === 'url' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
             <Globe className="w-5 h-5" /> {t('scamAnalyzer.analyzeUrl')}
           </button>
-          <button onClick={() => setActiveTab('image')} className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${activeTab === 'image' ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'}`}>
+          <button 
+            onClick={() => setActiveTab('image')} 
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
+              activeTab === 'image' 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
             <ImageIcon className="w-5 h-5" /> Analyze Image
           </button>
         </div>
 
         {activeTab === 'text' && (
           <div>
-            <textarea value={textInput} onChange={(e) => setTextInput(e.target.value)} placeholder={t('scamAnalyzer.textPlaceholder')} className="w-full h-40 px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" />
-            <button onClick={() => handleAnalysis('text', textInput || '')} disabled={!(textInput || '').trim() || isProcessing} className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {isProcessing ? (<><Loader2 className="w-5 h-5 animate-spin" />{t('scamAnalyzer.analyzing')}</>) : (<><Shield className="w-5 h-5" />{t('scamAnalyzer.analyze')}</>)}
+            <textarea 
+              value={textInput} 
+              onChange={(e) => setTextInput(e.target.value)} 
+              placeholder={t('scamAnalyzer.textPlaceholder')} 
+              className="w-full h-40 px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
+            />
+            <button 
+              onClick={() => handleAnalysis('text', textInput || '')} 
+              disabled={!(textInput || '').trim() || isProcessing} 
+              className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t('scamAnalyzer.analyzing')}
+                </>
+              ) : (
+                <>
+                  <Shield className="w-5 h-5" />
+                  {t('scamAnalyzer.analyze')}
+                </>
+              )}
             </button>
           </div>
         )}
         
         {activeTab === 'url' && (
           <div>
-            <input type="url" value={urlInput} onChange={(e) => setUrlInput(e.target.value)} placeholder={t('scamAnalyzer.urlPlaceholder')} className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-            <button onClick={() => handleAnalysis('url', urlInput || '')} disabled={!(urlInput || '').trim() || isProcessing} className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {isProcessing ? (<><Loader2 className="w-5 h-5 animate-spin" />{t('scamAnalyzer.analyzing')}</>) : (<><Globe className="w-5 h-5" />{t('scamAnalyzer.checkUrl')}</>)}
+            <input 
+              type="url" 
+              value={urlInput} 
+              onChange={(e) => setUrlInput(e.target.value)} 
+              placeholder={t('scamAnalyzer.urlPlaceholder')} 
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+            />
+            <button 
+              onClick={() => handleAnalysis('url', urlInput || '')} 
+              disabled={!(urlInput || '').trim() || isProcessing} 
+              className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  {t('scamAnalyzer.analyzing')}
+                </>
+              ) : (
+                <>
+                  <Globe className="w-5 h-5" />
+                  {t('scamAnalyzer.checkUrl')}
+                </>
+              )}
             </button>
           </div>
         )}
 
         {activeTab === 'image' && (
           <div>
-            <input type="file" accept="image/*" onChange={handleImageChange} ref={fileInputRef} className="hidden" />
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+              ref={fileInputRef} 
+              className="hidden" 
+            />
             <div
               onClick={() => fileInputRef.current?.click()}
               className="w-full h-40 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               {imagePreview ? (
-                <img src={imagePreview} alt="Selected preview" className="h-full w-full object-contain rounded-lg" />
+                <img 
+                  src={imagePreview} 
+                  alt="Selected preview" 
+                  className="h-full w-full object-contain rounded-lg" 
+                />
               ) : (
                 <div className="text-center text-gray-500">
                   <Upload className="w-10 h-10 mx-auto mb-2" />
@@ -476,8 +619,19 @@ export default function ScamAnalyzer() {
                 </div>
               )}
             </div>
-            <button onClick={handleImageUpload} disabled={!selectedImage || isProcessing} className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {isProcessing ? (<><Loader2 className="w-5 h-5 animate-spin" />Processing Image...</>) : (<>Extract & Analyze Image</>)}
+            <button 
+              onClick={handleImageUpload} 
+              disabled={!selectedImage || isProcessing} 
+              className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Processing Image...
+                </>
+              ) : (
+                <>Extract & Analyze Image</>
+              )}
             </button>
           </div>
         )}
@@ -497,49 +651,85 @@ export default function ScamAnalyzer() {
 
       {result && (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{t('scamAnalyzer.results')}</h2>
-          <div className={`border-2 rounded-lg p-6 mb-6 ${getThreatLevelColor(result.threatLevel)}`}>
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+            {t('scamAnalyzer.results')}
+          </h2>
+          
+          <div className={`border-2 rounded-lg p-6 mb-6 ${getThreatLevelColor(result.threatLevel, result.threatConfig)}`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                {getThreatLevelIcon(result.threatLevel)}
+                {getThreatLevelIcon(result.threatLevel, result.threatConfig)}
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{t('scamAnalyzer.threatLevel')}</p>
-                  <p className="text-2xl font-bold capitalize">{t(`scamAnalyzer.${result.threatLevel}`)}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    {t('scamAnalyzer.threatLevel')}
+                  </p>
+                  <p className="text-2xl font-bold capitalize">
+                    {result.threatConfig?.displayName || t(`scamAnalyzer.${result.threatLevel}`)}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-600">{t('scamAnalyzer.confidence')}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  {t('scamAnalyzer.confidence')}
+                </p>
                 <p className="text-2xl font-bold">{result.confidence}%</p>
                 {result.ocrConfidence && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500">OCR Confidence</p>
-                    <p className="text-sm font-medium">{(result.ocrConfidence * 100).toFixed(1)}%</p>
+                    <p className="text-sm font-medium">
+                      {(result.ocrConfidence * 100).toFixed(1)}%
+                    </p>
                   </div>
                 )}
               </div>
             </div>
+            
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className={`h-full rounded-full transition-all duration-500 ${result.threatLevel === 'safe' ? 'bg-green-500' : result.threatLevel === 'suspicious' ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${result.confidence}%` }} />
+              <div 
+                className={`h-full rounded-full transition-all duration-500 ${getProgressBarColor(result.threatLevel, result.threatConfig)}`} 
+                style={{ width: `${result.confidence}%` }} 
+              />
             </div>
           </div>
+          
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2"><AlertTriangle className="w-5 h-5 text-orange-500" /> {t('scamAnalyzer.indicators')}</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-orange-500" /> 
+                {t('scamAnalyzer.indicators')}
+              </h3>
               <ul className="space-y-2">
-                {result.indicators.map((indicator, index) => (<li key={index} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span className="text-orange-500 mt-1">•</span> {indicator}</li>))}
+                {result.indicators.map((indicator, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-orange-500 mt-1">•</span> 
+                    {indicator}
+                  </li>
+                ))}
               </ul>
             </div>
+            
             <div>
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-blue-500" /> {t('scamAnalyzer.recommendations')}</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-blue-500" /> 
+                {t('scamAnalyzer.recommendations')}
+              </h3>
               <ul className="space-y-2">
-                {result.recommendations.map((recommendation, index) => (<li key={index} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"><span className="text-blue-500 mt-1">✓</span> {recommendation}</li>))}
+                {result.recommendations.map((recommendation, index) => (
+                  <li key={index} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
+                    <span className="text-blue-500 mt-1">✓</span> 
+                    {recommendation}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           
           {result.extractedText && (
             <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
-              <p className="text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2"><ImageIcon className="w-4 h-4" /> Extracted Text from Image</p>
+              <p className="text-sm text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4" /> 
+                Extracted Text from Image
+              </p>
               <div className="mt-2 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap max-h-32 overflow-y-auto">
                 {result.extractedText}
               </div>
@@ -547,12 +737,18 @@ export default function ScamAnalyzer() {
           )}
           
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 flex items-center gap-2"><Shield className="w-4 h-4" /> {result.summary ? 'AI Summary' : t('scamAnalyzer.aiPowered')}</p>
-            {result.summary && <p className="text-sm text-blue-900 mt-2 whitespace-pre-wrap">{result.summary}</p>}
+            <p className="text-sm text-blue-800 flex items-center gap-2">
+              <Shield className="w-4 h-4" /> 
+              {result.summary ? 'AI Summary' : t('scamAnalyzer.aiPowered')}
+            </p>
+            {result.summary && (
+              <p className="text-sm text-blue-900 mt-2 whitespace-pre-wrap">
+                {result.summary}
+              </p>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
-

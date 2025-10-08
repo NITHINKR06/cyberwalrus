@@ -4,8 +4,12 @@ import AnalyzerHistory from '../models/AnalyzerHistory.js';
 import User from '../models/User.js';
 import { authenticateToken } from './auth.js';
 import aiAnalyzer from '../services/aiAnalyzer.js';
+import configurableAnalyzer from '../services/aiAnalyzerConfigurable.js';
 
 const router = express.Router();
+
+// Flag to switch between original and configurable analyzer
+const USE_CONFIGURABLE_ANALYZER = false;
 
 // Analyze content (public endpoint - no auth required)
 router.post('/analyze', async (req, res) => {
@@ -43,9 +47,12 @@ router.post('/analyze', async (req, res) => {
       }
     }
 
+    // Use configurable analyzer if enabled
+    const analyzer = USE_CONFIGURABLE_ANALYZER ? configurableAnalyzer : aiAnalyzer;
+    
     // Perform AI-powered analysis
     console.log(`Analyzing ${inputType}: ${inputContent.substring(0, 50)}...`);
-    const analysisResult = await aiAnalyzer.analyze(inputType, inputContent);
+    const analysisResult = await analyzer.analyze(inputType, inputContent);
 
     console.log('Analysis result:', analysisResult);
 
@@ -147,5 +154,29 @@ router.get('/session/:sessionId', async (req, res) => {
 });
 
 // Removed the hardcoded analysis function - now using AI services
+
+// Get current analyzer configuration
+router.get('/configuration', async (req, res) => {
+  try {
+    if (!USE_CONFIGURABLE_ANALYZER) {
+      return res.status(404).json({
+        success: false,
+        error: 'Configuration endpoint not available in original analyzer mode'
+      });
+    }
+    
+    const configuration = configurableAnalyzer.getConfiguration();
+    res.json({
+      success: true,
+      configuration
+    });
+  } catch (error) {
+    console.error('Error fetching configuration:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch analyzer configuration'
+    });
+  }
+});
 
 export default router;

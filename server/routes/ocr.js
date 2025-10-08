@@ -7,7 +7,7 @@ import Tesseract from 'tesseract.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
+const upload = multer({ storage: multer.memoryStorage() }); // Use memory storage for file uploads
 const router = express.Router();
 
 // Configure multer for file uploads
@@ -24,20 +24,6 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    // Check if file is an image
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
-  }
-});
 
 // OCR Upload endpoint
 router.post('/upload', upload.single('image'), async (req, res) => {
@@ -92,6 +78,20 @@ router.post('/upload', upload.single('image'), async (req, res) => {
       details: error.message 
     });
   }
+});
+
+router.post('/ocr', upload.single('image'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No image file uploaded.' });
+    }
+
+    try {
+        const ocrResult = await aiAnalyzer.processImageWithOCR(req.file.buffer);
+        res.json(ocrResult);
+    } catch (error) {
+        console.error('OCR processing error:', error);
+        res.status(500).json({ error: 'Failed to process the image.' });
+    }
 });
 
 // Get OCR result endpoint (for future use)
