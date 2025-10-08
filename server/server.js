@@ -14,7 +14,6 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
 // Middleware
 app.use(cors({
   origin: function(origin, callback) {
@@ -67,12 +66,14 @@ import authRoutes from './routes/auth.js';
 import reportRoutes from './routes/reports.js';
 import analyzerRoutes from './routes/analyzer.js';
 import userRoutes from './routes/user.js';
+import scenarioRoutes from './routes/scenarios.js';
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/analyzer', analyzerRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/scenarios', scenarioRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

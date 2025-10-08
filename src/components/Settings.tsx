@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 import { 
   Settings as SettingsIcon, 
   Palette, 
@@ -35,15 +36,11 @@ interface SettingsData {
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
+  const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
 
   const [settings, setSettings] = useState<SettingsData>({
-    theme: 'system',
+    theme: theme,
     language: i18n.language || 'en',
     notifications: {
       email: true,
@@ -73,17 +70,10 @@ export default function Settings() {
     }
   }, []);
 
+  // Sync theme with context
   useEffect(() => {
-    // Apply theme
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
+    setSettings(prev => ({ ...prev, theme }));
+  }, [theme]);
 
   const handleSettingChange = (category: keyof SettingsData, key: string, value: any) => {
     setSettings(prev => ({
@@ -100,14 +90,9 @@ export default function Settings() {
     setSettings(prev => ({ ...prev, language }));
   };
 
-  const handleThemeChange = (theme: 'light' | 'dark' | 'system') => {
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDark(prefersDark);
-    } else {
-      setIsDark(theme === 'dark');
-    }
-    setSettings(prev => ({ ...prev, theme }));
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    setTheme(newTheme);
+    setSettings(prev => ({ ...prev, theme: newTheme }));
   };
 
   const handleSaveSettings = async () => {

@@ -48,6 +48,14 @@ export const authService = {
   }
 };
 
+// Add this new service to the file
+export const timeMachineService = {
+  getScenariosByEra: async (year: number) => {
+    const response = await api.get(`/scenarios/era/${year}`);
+    return response.data;
+  },
+};
+
 // ADD THIS NEW FUNCTION to backendApi.ts
 
 // Convenience function for the vulnerable analyzer

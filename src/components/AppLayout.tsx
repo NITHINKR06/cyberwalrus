@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import Auth from './Auth';
 import LanguageSwitcher from './LanguageSwitcher';
 import NavDropdown from './NavDropdown';
@@ -28,25 +29,10 @@ import {
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+  const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
 
   if (!user) {
     return <Auth />;
@@ -152,7 +138,7 @@ export default function AppLayout() {
                 <LanguageSwitcher />
                 
                 <button
-                  onClick={() => setIsDark(v => !v)}
+                  onClick={toggleTheme}
                   aria-label="Toggle theme"
                   className="p-2 rounded-xl border border-glass bg-white/5 text-gray-900 dark:text-white hover:bg-white/10 transition-colors"
                 >

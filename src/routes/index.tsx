@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import Auth from '../components/Auth';
 import Dashboard from '../components/Dashboard';
 import LearningModules from '../components/LearningModules';
@@ -14,7 +15,7 @@ import AppLayout from '../components/AppLayout';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AuthProvider><AppLayout /></AuthProvider>,
+    element: <ThemeProvider><AuthProvider><AppLayout /></AuthProvider></ThemeProvider>,
     children: [
       {
         index: true,
