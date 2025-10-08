@@ -26,7 +26,8 @@ import {
   Target,
   Clock,
   Bell,
-  Zap
+  Zap,
+  Info
 } from 'lucide-react';
 
 export default function AppLayout() {
@@ -56,6 +57,7 @@ export default function AppLayout() {
   const userMenuItems = [
     { id: 'profile', name: t('nav.profile', 'Profile'), icon: User, onClick: () => navigate('/profile') },
     { id: 'settings', name: t('nav.settings', 'Settings'), icon: Settings, onClick: () => navigate('/settings') },
+    { id: 'about', name: t('nav.about', 'About'), icon: Info, onClick: () => navigate('/about') },
     { id: 'logout', name: t('nav.logout'), icon: LogOut, onClick: logout },
   ];
 
@@ -67,7 +69,7 @@ export default function AppLayout() {
   ] as const;
 
   const isActiveRoute = (path: string) => {
-    return location.pathname === path || (path === '/dashboard' && location.pathname === '/');
+    return location.pathname === path;
   };
 
   return (
@@ -83,7 +85,7 @@ export default function AppLayout() {
             {/* Logo Section */}
             <div className="flex items-center min-w-fit">
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/')}
                 className="flex items-center gap-3 group"
               >
                 <div className="logo-gradient p-2 rounded-xl transition-all duration-300">
@@ -108,8 +110,9 @@ export default function AppLayout() {
                   { id: 'achievements', name: t('nav.achievements'), icon: Award, onClick: () => navigate('/achievements') },
                   { id: 'leaderboard', name: t('nav.leaderboard'), icon: Trophy, onClick: () => navigate('/achievements') },
                   { id: 'goals', name: t('nav.goals', 'Goals & Progress'), icon: Target, onClick: () => navigate('/achievements') },
+                  { id: 'about', name: t('nav.about', 'About'), icon: Info, onClick: () => navigate('/about') },
                 ]}
-                isActive={isActiveRoute('/dashboard') || isActiveRoute('/modules') || isActiveRoute('/achievements')}
+                isActive={isActiveRoute('/dashboard') || isActiveRoute('/modules') || isActiveRoute('/achievements') || location.pathname === '/'}
               />
               
               {/* Elegant Separator */}

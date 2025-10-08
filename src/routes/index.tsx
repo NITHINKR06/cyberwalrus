@@ -11,6 +11,7 @@ import SecuritySandbox from '../components/SecuritySandbox';
 import TimeMachine from '../components/TimeMachine';
 import UserProfile from '../components/UserProfile';
 import Settings from '../components/Settings';
+import About from '../components/About';
 import AppLayout from '../components/AppLayout';
 
 export const router = createBrowserRouter([
@@ -20,7 +21,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Dashboard />,
+        element: <About />,
       },
       {
         path: 'dashboard',
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <Settings />,
+      },
+      {
+        path: 'about',
+        element: <About />,
       },
     ],
   },
