@@ -77,12 +77,17 @@ export default function AppLayout() {
           <div className="flex justify-between items-center h-16">
             {/* Logo Section */}
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500">
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="flex-shrink-0 flex items-center gap-3 hover:scale-105 transition-transform duration-200 group"
+              >
+                <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 shadow-lg group-hover:shadow-xl transition-shadow duration-200">
                   <Shield className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300">WALRUS</span>
-              </div>
+                <span className="text-xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300 group-hover:from-indigo-500 group-hover:via-cyan-400 group-hover:to-teal-400 transition-all duration-200">
+                  WALRUS
+                </span>
+              </button>
             </div>
 
             {/* Main Navigation - Hidden on mobile */}
@@ -98,7 +103,7 @@ export default function AppLayout() {
               {/* Learning Modules */}
               <button
                 onClick={() => navigate('/modules')}
-                className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'} min-w-0`}
+                className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'} min-w-0 hover:scale-105 transition-all duration-200`}
               >
                 <BookOpen className="w-4 h-4" />
                 <span className="hidden xl:inline">{t('nav.learn')}</span>
@@ -123,9 +128,9 @@ export default function AppLayout() {
                     <button
                       key={item.id}
                       onClick={() => navigate(item.path)}
-                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'} min-w-0`}
+                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'} min-w-0 hover:scale-105 transition-all duration-200 group`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-4 h-4 group-hover:rotate-12 transition-transform duration-200" />
                       <span className="hidden xl:inline">{item.name}</span>
                     </button>
                   );
