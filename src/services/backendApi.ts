@@ -142,6 +142,21 @@ export const analyzerService = {
   }
 };
 
+// OCR Services
+export const ocrService = {
+  uploadImage: async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await api.post('/ocr/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  }
+};
+
 // User Services
 export const userService = {
   getProfile: async () => {

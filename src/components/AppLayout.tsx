@@ -70,7 +70,7 @@ export default function AppLayout() {
     <div className="min-h-screen bg-midnight-900 relative overflow-x-hidden">
       <div className="bg-pattern" />
       <div className="bg-scanline-overlay" />
-      <nav className="sticky top-0 z-50 backdrop-blur-md border-b border-glass bg-[rgba(255,255,255,0.6)] dark:bg-[rgba(15,23,42,0.7)]">
+      <nav className="sticky top-0 z-50 backdrop-blur-md border-b border-glass bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(15,23,42,0.7)]">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo Section */}
@@ -168,7 +168,7 @@ export default function AppLayout() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-glass bg-[rgba(15,23,42,0.85)] backdrop-blur-md">
+          <div className="md:hidden border-t border-glass bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-md">
             <div className="px-4 py-3 space-y-3">
               {/* Dashboard Section */}
               <div>

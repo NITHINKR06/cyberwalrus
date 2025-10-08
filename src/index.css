@@ -5,10 +5,10 @@
 @layer base {
   :root {
     /* Light theme defaults */
-    --bg-midnight: 245 247 255; /* light panel */
-    --bg-panel: 255 255 255;
-    --text-primary: 17 24 39; /* gray-900 - better contrast */
-    --text-secondary: 55 65 81; /* gray-700 - better contrast */
+    --bg-midnight: 241 245 249; /* slate-100 - slightly darker for better contrast */
+    --bg-panel: 255 255 255;    /* pure white for cards */
+    --text-primary: 2 8 23;     /* slate-950 - much darker for better contrast */
+    --text-secondary: 30 41 59; /* slate-800 - better contrast */
     /* Brand gradient (light) */
     --primary-start: 99 102 241;   /* indigo-500 */
     --primary-mid: 14 165 233;     /* sky-500 */
@@ -43,17 +43,17 @@
     z-index: -1;
     pointer-events: none;
     background:
-      /* fine horizontal lines */
+      /* fine horizontal lines - more visible in light theme */
       repeating-linear-gradient(
         to bottom,
-        rgba(0,0,0,0.06) 0px,
-        rgba(0,0,0,0.06) 1px,
+        rgba(0,0,0,0.12) 0px,
+        rgba(0,0,0,0.12) 1px,
         transparent 1px,
         transparent 6px
       ),
-      radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.10), transparent 60%),
-      radial-gradient(1000px 500px at 90% 0%, rgba(34,211,238,0.08), transparent 60%),
-      radial-gradient(800px 400px at 50% 120%, rgba(30,200,255,0.06), transparent 60%);
+      radial-gradient(1200px 600px at 10% -20%, rgba(99,102,241,0.15), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(34,211,238,0.12), transparent 60%),
+      radial-gradient(800px 400px at 50% 120%, rgba(30,200,255,0.10), transparent 60%);
     opacity: 0.9;
     animation: bg-drift 22s linear infinite;
     transform: translateZ(0);
@@ -80,13 +80,19 @@
     mix-blend-mode: multiply;
   }
   .border-glass {
+    border-color: rgba(0,0,0,0.15);
+  }
+  .dark .border-glass {
     border-color: rgba(255,255,255,0.12);
   }
   .shadow-neon {
     box-shadow: 0 0 20px rgba(30, 200, 255, 0.35), 0 0 60px rgba(99, 102, 241, 0.25);
   }
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-glass rounded-2xl;
+    @apply bg-white/20 backdrop-blur-xl border border-glass rounded-2xl;
+  }
+  .dark .glass-card {
+    @apply bg-white/5;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold text-white transition-all duration-200 active:scale-[0.98];
@@ -101,13 +107,14 @@
   /* Clean navbar buttons without glow */
   .btn-nav {
     @apply inline-flex items-center gap-2 px-3 py-2 rounded-lg font-medium border transition-all duration-200;
-    background-color: rgba(0,0,0,0.03);
-    color: #374151; /* gray-700 for better contrast */
-    border-color: rgba(0,0,0,0.06);
+    background-color: rgba(0,0,0,0.08);
+    color: #0f172a; /* slate-900 for better contrast */
+    border-color: rgba(0,0,0,0.15);
   }
   .btn-nav:hover {
-    background-color: rgba(0,0,0,0.08);
+    background-color: rgba(0,0,0,0.12);
     transform: translateY(-1px);
+    border-color: rgba(0,0,0,0.2);
   }
   .dark .btn-nav {
     background-color: rgba(255,255,255,0.03);
@@ -133,23 +140,32 @@
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl font-semibold border transition-all duration-200;
-    background-color: rgba(0,0,0,0.05);
-    color: #1f2937; /* gray-800 for better contrast */
-    border-color: rgba(0,0,0,0.08);
+    background-color: rgba(0,0,0,0.08);
+    color: #0f172a; /* slate-900 for better contrast */
+    border-color: rgba(0,0,0,0.15);
+  }
+  .btn-secondary:hover {
+    background-color: rgba(0,0,0,0.12);
+    border-color: rgba(0,0,0,0.22);
   }
   .dark .btn-secondary {
     background-color: rgba(255,255,255,0.05);
     color: #f9fafb; /* gray-50 for better contrast */
     border-color: rgba(255,255,255,0.12);
   }
+  .dark .btn-secondary:hover {
+    background-color: rgba(255,255,255,0.08);
+  }
   .card {
     @apply p-6 rounded-2xl backdrop-blur-xl;
-    background-color: rgba(var(--bg-panel), 0.9);
-    border: 1px solid rgba(0,0,0,0.06);
+    background-color: rgba(var(--bg-panel), 0.98);
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
   }
   .dark .card {
     background-color: rgba(255,255,255,0.05);
     border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
   }
   .section-title {
     @apply text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent drop-shadow;
