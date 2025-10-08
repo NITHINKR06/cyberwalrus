@@ -72,7 +72,7 @@ export default function AppLayout() {
     <div className="min-h-screen bg-midnight-900 relative overflow-x-hidden">
       <div className="bg-pattern" />
       <div className="bg-scanline-overlay" />
-      <nav className="sticky top-0 z-50 backdrop-blur-md border-b border-glass bg-[rgba(255,255,255,0.8)] dark:bg-[rgba(15,23,42,0.7)]">
+      <nav className="sticky top-0 z-50 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 shadow-sm">
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo Section */}
@@ -142,7 +142,7 @@ export default function AppLayout() {
                 <button
                   onClick={toggleTheme}
                   aria-label="Toggle theme"
-                  className="p-2 rounded-xl border border-glass bg-white/5 text-gray-900 dark:text-white hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   {isDark ? '🌙' : '🌞'}
                 </button>
@@ -160,7 +160,7 @@ export default function AppLayout() {
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden p-2 rounded-xl text-gray-900 dark:text-white bg-white/5 border border-glass hover:bg-white/10 transition-colors"
+                  className="md:hidden p-2 rounded-xl text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
@@ -170,7 +170,7 @@ export default function AppLayout() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-glass bg-[rgba(255,255,255,0.9)] dark:bg-[rgba(15,23,42,0.85)] backdrop-blur-md">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
             <div className="px-4 py-3 space-y-3">
               {/* Dashboard Section */}
               <div>

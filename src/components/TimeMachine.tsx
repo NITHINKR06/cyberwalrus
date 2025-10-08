@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { timeMachineService } from '../services/backendApi';
-import { Clock, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 
 interface Scenario {
   id: number;
@@ -55,7 +55,7 @@ export default function TimeMachine() {
             className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
               era === year
                 ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 hover:bg-gray-100'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
             }`}
           >
             {name}
@@ -69,7 +69,7 @@ export default function TimeMachine() {
         
         <div className="space-y-6">
           {scenarios.map((scenario) => (
-            <div key={scenario.id} className="bg-white rounded-xl shadow-md overflow-hidden">
+            <div key={scenario.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
               <div className="p-6">
                 <div className="flex justify-between items-start">
                   <div>
