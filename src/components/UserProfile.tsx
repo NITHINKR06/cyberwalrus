@@ -211,7 +211,7 @@ export default function UserProfile() {
                   className={`w-full px-4 py-3 rounded-xl border transition-colors ${
                     errors.username
                       ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
                   } ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
                   placeholder="Enter your username"
                 />
@@ -238,7 +238,7 @@ export default function UserProfile() {
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-colors ${
                       errors.email
                         ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100'
+                        : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
                     } ${!isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
                     placeholder="Enter your email"
                   />
@@ -271,7 +271,7 @@ export default function UserProfile() {
                           className={`w-full px-4 py-3 rounded-xl border transition-colors ${
                             errors.currentPassword
                               ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100'
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
                           }`}
                           placeholder="Enter current password"
                         />
@@ -304,7 +304,7 @@ export default function UserProfile() {
                           className={`w-full px-4 py-3 rounded-xl border transition-colors ${
                             errors.newPassword
                               ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100'
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
                           }`}
                           placeholder="Enter new password"
                         />
@@ -337,7 +337,7 @@ export default function UserProfile() {
                           className={`w-full px-4 py-3 rounded-xl border transition-colors ${
                             errors.confirmPassword
                               ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100'
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
                           }`}
                           placeholder="Confirm new password"
                         />

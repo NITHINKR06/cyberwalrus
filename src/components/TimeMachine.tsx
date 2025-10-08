@@ -43,8 +43,8 @@ export default function TimeMachine() {
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('timeMachine.title')}</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('timeMachine.title')}</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400">
           {t('timeMachine.subtitle')}
         </p>
       </div>
@@ -76,24 +76,24 @@ export default function TimeMachine() {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="text-sm font-semibold text-blue-600">{scenario.year}</p>
-                    <h3 className="text-2xl font-bold text-gray-900 mt-1">{scenario.name}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-1">{scenario.name}</h3>
                   </div>
                   <div className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                     {era === 2015 ? t('timeMachine.classic') : era === 2025 ? t('timeMachine.modern') : t('timeMachine.future')}
                   </div>
                 </div>
-                <p className="mt-3 text-gray-600">{scenario.description}</p>
+                <p className="mt-3 text-gray-600 dark:text-gray-400">{scenario.description}</p>
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h4 className="font-semibold text-red-600 flex items-center gap-2 mb-2"><AlertTriangle size={18} /> {t('timeMachine.redFlags')}</h4>
-                    <ul className="list-disc list-inside space-y-1 text-gray-700">
+                    <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                       {scenario.red_flags.map((flag, i) => <li key={i}>{flag}</li>)}
                     </ul>
                   </div>
                   <div>
                     <h4 className="font-semibold text-green-600 flex items-center gap-2 mb-2"><ShieldCheck size={18} /> {t('timeMachine.impactPrevention')}</h4>
-                    <p className="text-gray-700">{scenario.impact.summary}</p>
+                    <p className="text-gray-700 dark:text-gray-300">{scenario.impact.summary}</p>
                   </div>
                 </div>
               </div>

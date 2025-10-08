@@ -377,7 +377,7 @@ export default function ReportScam() {
                     </label>
                     <select
                       name="scamType" value={formData.scamType} onChange={handleChange} required
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">Select a scam type</option>
                       {scamTypes.map(type => (<option key={type} value={type}>{type}</option>))}
@@ -390,7 +390,7 @@ export default function ReportScam() {
                     </label>
                     <textarea
                       name="description" value={formData.description} onChange={handleChange} required rows={4}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       placeholder="Please provide as much detail as possible about the scam..."
                     />
                   </div>
@@ -399,14 +399,14 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Website URL</label>
                       <input type="url" name="url" value={formData.url} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="https://example.com"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                       <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="+1 (555) 123-4567"
                       />
                     </div>
@@ -416,14 +416,14 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                       <input type="email" name="email" value={formData.email} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="scammer@example.com"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Severity *</label>
                       <select name="severity" value={formData.severity} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
@@ -442,14 +442,14 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
                       <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter your full name"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
                       <input type="tel" name="mobile" value={formData.mobile} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="9876543210"
                       />
                     </div>
@@ -458,7 +458,7 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
                       <select name="gender" value={formData.gender} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Gender</option>
                         {genders.map(gender => (<option key={gender} value={gender}>{gender}</option>))}
@@ -467,13 +467,13 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                       <input type="date" name="dob" value={formData.dob} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                       <input type="email" name="emailAddress" value={formData.emailAddress} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="your@email.com"
                       />
                     </div>
@@ -482,14 +482,14 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Spouse Name</label>
                       <input type="text" name="spouse" value={formData.spouse} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Spouse name if applicable"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Relation with Victim</label>
                       <input type="text" name="relationWithVictim" value={formData.relationWithVictim} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Self/Spouse/Parent/Guardian"
                       />
                     </div>
@@ -513,14 +513,14 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">House No.</label>
                       <input type="text" name="houseNo" value={formData.houseNo} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="House/Flat number"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Street Name *</label>
                       <input type="text" name="streetName" value={formData.streetName} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Street/Lane name"
                       />
                     </div>
@@ -529,16 +529,15 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Colony/Area</label>
                       <input type="text" name="colony" value={formData.colony} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Colony/Area name"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Village/Town *</label>
                       <input type="text" name="village" value={formData.village} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Village/Town name"
-                        style={{backgroundColor: formData.village ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                   </div>
@@ -546,23 +545,21 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Tehsil *</label>
                       <input type="text" name="tehsil" value={formData.tehsil} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Tehsil name"
-                        style={{backgroundColor: formData.tehsil ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">District *</label>
                       <input type="text" name="district" value={formData.district} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="District name"
-                        style={{backgroundColor: formData.district ? '#f0f9ff' : 'white', color: '#111827'}}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
                       <select name="state" value={formData.state} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select State</option>
                         {states.map(state => (<option key={state} value={state}>{state}</option>))}
@@ -573,7 +570,7 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Police Station *</label>
                       <input type="text" name="policeStation" value={formData.policeStation} onChange={handleChange} required
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Police station name"
                       />
                     </div>
@@ -582,7 +579,7 @@ export default function ReportScam() {
                       <div className="flex gap-2">
                         <div className="flex-1 relative">
                           <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} required
-                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="6-digit pincode" maxLength={6}
                           />
                           {isPincodeLoading && (
@@ -603,7 +600,7 @@ export default function ReportScam() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
                       <input type="text" name="country" value={formData.country} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-100 text-gray-900 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Country"
                       />
                     </div>

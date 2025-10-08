@@ -74,68 +74,69 @@ export default function AppLayout() {
     <div className="min-h-screen bg-midnight-900 relative overflow-x-hidden">
       <div className="bg-pattern" />
       <div className="bg-scanline-overlay" />
-      <nav className="sticky top-0 z-50 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 bg-white/95 dark:bg-gray-900/95 shadow-sm">
-        {/* Status Bar */}
-        <div className="h-1 bg-gradient-to-r from-indigo-500 via-cyan-400 to-teal-400"></div>
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <nav className="navbar-clean sticky top-0 z-50">
+        {/* Gradient accent line */}
+        <div className="h-0.5 bg-gradient-to-r from-indigo-500 via-cyan-400 to-teal-400"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16 gap-6">
             {/* Logo Section */}
-            <div className="flex items-center">
+            <div className="flex items-center min-w-fit">
               <button 
                 onClick={() => navigate('/dashboard')}
-                className="flex-shrink-0 flex items-center gap-3 hover:scale-105 transition-transform duration-200 group"
+                className="flex items-center gap-3 group"
               >
-                <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 shadow-lg group-hover:shadow-xl transition-shadow duration-200">
-                  <Shield className="w-6 h-6 text-white" />
+                <div className="logo-gradient p-2 rounded-xl transition-all duration-300">
+                  <Shield className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-extrabold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-300 to-teal-300 group-hover:from-indigo-500 group-hover:via-cyan-400 group-hover:to-teal-400 transition-all duration-200">
+                <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-cyan-500 bg-clip-text text-transparent hidden sm:block">
                   WALRUS
                 </span>
               </button>
             </div>
 
             {/* Main Navigation - Hidden on mobile */}
-            <div className="hidden lg:flex items-center gap-2">
-              {/* Dashboard Dropdown */}
-              <NavDropdown
-                label={t('nav.dashboard')}
-                icon={LayoutDashboard}
-                items={dashboardItems}
-                isActive={isActiveRoute('/dashboard')}
-              />
-              
-              {/* Learning Modules */}
-              <button
-                onClick={() => navigate('/modules')}
-                className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'} hover:scale-105 transition-all duration-200`}
-              >
-                <BookOpen className="w-5 h-5" />
-                <span>{t('nav.learn')}</span>
-              </button>
+            <div className="hidden lg:flex items-center gap-2 flex-1 justify-center">
+              {/* Primary Navigation */}
+              <div className="flex items-center gap-1">
+                <NavDropdown
+                  label={t('nav.dashboard')}
+                  icon={LayoutDashboard}
+                  items={dashboardItems}
+                  isActive={isActiveRoute('/dashboard')}
+                />
+                
+                <button
+                  onClick={() => navigate('/modules')}
+                  className={`${isActiveRoute('/modules') ? 'btn-nav-active' : 'btn-nav'}`}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span>{t('nav.learn')}</span>
+                </button>
 
-              {/* Achievements Dropdown */}
-              <NavDropdown
-                label={t('nav.achievements')}
-                icon={Award}
-                items={achievementsItems}
-                isActive={isActiveRoute('/achievements')}
-              />
+                <NavDropdown
+                  label={t('nav.achievements')}
+                  icon={Award}
+                  items={achievementsItems}
+                  isActive={isActiveRoute('/achievements')}
+                />
+              </div>
               
-              {/* Separator */}
-              <div className="w-px h-8 bg-gray-300 dark:bg-gray-600 mx-3"></div>
+              {/* Elegant Separator */}
+              <div className="w-px h-8 bg-gradient-to-b from-transparent via-gray-300 to-transparent dark:via-gray-600 mx-3"></div>
               
-              {/* Tools Navigation Group */}
-              <div className="flex items-center gap-2">
+              {/* Tools Navigation */}
+              <div className="flex items-center gap-1">
                 {toolsNavigation.map((item) => {
                   const Icon = item.icon;
                   return (
                     <button
                       key={item.id}
                       onClick={() => navigate(item.path)}
-                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'} hover:scale-105 transition-all duration-200 group`}
+                      className={`${isActiveRoute(item.path) ? 'btn-nav-active' : 'btn-nav'}`}
                     >
-                      <Icon className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-                      <span>{item.name}</span>
+                      <Icon className="w-4 h-4" />
+                      <span className="hidden xl:inline">{item.name}</span>
                     </button>
                   );
                 })}
@@ -143,60 +144,46 @@ export default function AppLayout() {
             </div>
 
             {/* Right Section - User Info & Controls */}
-            <div className="flex items-center gap-4">
-              {/* Quick Search */}
-              <div className="hidden lg:block">
-                <button
-                  onClick={() => navigate('/analyzer')}
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
-                  title={t('nav.quickAnalysis', 'Quick Analysis')}
-                >
-                  <Search className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-                  <span className="hidden xl:inline text-sm font-medium">Quick Search</span>
-                </button>
-              </div>
-
+            <div className="flex items-center gap-2 min-w-fit">
               {/* Utility Controls */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1">
                 <LanguageSwitcher />
                 
                 {/* Notifications */}
                 <button
-                  className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group relative"
+                  className="btn-utility relative"
                   title={t('nav.notifications', 'Notifications')}
                 >
-                  <Bell className="w-5 h-5 group-hover:animate-pulse" />
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                  <Bell className="w-5 h-5" />
+                  <span className="notification-badge"></span>
                 </button>
                 
                 <button
                   onClick={toggleTheme}
                   aria-label="Toggle theme"
-                  className="p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
+                  className="btn-utility"
                 >
-                  <span className="group-hover:rotate-180 transition-transform duration-300 text-lg">
-                    {isDark ? '🌙' : '🌞'}
+                  <span className="text-xl">
+                    {isDark ? '🌙' : '☀️'}
                   </span>
                 </button>
 
                 {/* User Dropdown */}
-                <div className="hidden md:block">
+                <div className="hidden md:block ml-2">
                   <NavDropdown
                     label={user.username}
                     icon={User}
                     items={userMenuItems}
-                    className="hover:scale-105 transition-transform duration-200"
+                    className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/20 dark:to-cyan-900/20 border border-indigo-200 dark:border-indigo-800"
                   />
                 </div>
 
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="md:hidden p-2.5 rounded-lg text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 hover:scale-105 transition-all duration-200 group"
+                  className="lg:hidden btn-utility ml-2"
                 >
-                  <span className="group-hover:rotate-90 transition-transform duration-200">
-                    {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                  </span>
+                  {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -204,8 +191,8 @@ export default function AppLayout() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md animate-in slide-in-from-top-2 duration-200">
-            <div className="px-4 py-3 space-y-3">
+          <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <div className="px-4 py-3 space-y-2">
               {/* Dashboard Section */}
               <div>
                 <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-2">

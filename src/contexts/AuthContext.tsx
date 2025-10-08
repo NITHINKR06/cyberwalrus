@@ -19,6 +19,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check for demo user first
+    const demoUser = localStorage.getItem('user');
+    if (demoUser) {
+      try {
+        const parsedUser = JSON.parse(demoUser);
+        setUser(parsedUser);
+        setIsLoading(false);
+        return;
+      } catch (e) {
+        localStorage.removeItem('user');
+      }
+    }
+
     // Check for stored token and validate it
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -171,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user'); // Also clear demo user
     // Clear session cookie by making a logout request
     fetch(`${API_URL}/auth/logout`, {
       method: 'POST',

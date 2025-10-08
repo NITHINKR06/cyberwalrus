@@ -135,6 +135,28 @@ export default function Auth() {
               {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
             </button>
           </div>
+
+          {/* Demo Login Button for Testing */}
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => {
+                // Use mock authentication for demo
+                const mockUser = {
+                  id: 'demo-user',
+                  username: 'DemoUser',
+                  email: 'demo@example.com',
+                  points: 1250,
+                  level: 5,
+                  badges: ['guardian', 'detector', 'educator']
+                };
+                localStorage.setItem('user', JSON.stringify(mockUser));
+                window.location.reload();
+              }}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 font-medium text-sm underline"
+            >
+              Quick Demo Login (Testing Only)
+            </button>
+          </div>
         </div>
       </div>
     </div>

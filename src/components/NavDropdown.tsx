@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface DropdownItem {
   id: string;
@@ -33,36 +33,40 @@ export default function NavDropdown({ label, icon: Icon, items, isActive = false
     };
   }, []);
 
-  return (
+  return (  
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`${isActive ? 'btn-nav-active' : 'btn-nav'} ${className}`}
+        className={`${isActive ? 'btn-nav-active' : 'btn-nav'} ${className} group`}
       >
-        <Icon className="w-5 h-5" />
+        <Icon className="w-4 h-4" />
         <span>{label}</span>
-        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg backdrop-blur-md z-50">
-          <div className="py-2">
-            {items.map((item) => {
-              const ItemIcon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    item.onClick();
-                    setIsOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  <ItemIcon className="w-4 h-4" />
-                  <span className="font-medium">{item.name}</span>
-                </button>
-              );
-            })}
+        <div className="absolute top-full left-0 mt-2 w-56 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl backdrop-blur-xl overflow-hidden">
+            <div className="py-1">
+              {items.map((item, index) => {
+                const ItemIcon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      item.onClick();
+                      setIsOpen(false);
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-cyan-50 dark:hover:from-indigo-900/20 dark:hover:to-cyan-900/20 transition-all duration-200 group/item"
+                  >
+                    <div className="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 group-hover/item:bg-gradient-to-br group-hover/item:from-indigo-500 group-hover/item:to-cyan-500 transition-all duration-200">
+                      <ItemIcon className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400 group-hover/item:text-white" />
+                    </div>
+                    <span className="font-medium text-sm group-hover/item:text-gray-900 dark:group-hover/item:text-white">{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
